@@ -20,6 +20,8 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        // 瀏覽器永久記住登入狀態
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     </script>
     <style>
         :root {
@@ -970,10 +972,7 @@
                     <button class="popup-item" onclick="alert('學習統計功能即將推出！')">
                         <span class="pi-icon">📊</span><span>學習統計</span>
                     </button>
-                    <button class="popup-item" onclick="syncToCloud()">
-                        <span class="pi-icon">☁️</span>
-                        <span>備份與同步<span class="pi-sub">手動同步到雲端</span></span>
-                    </button>
+
                 </div>
                 <div class="popup-section">
                     <button class="popup-item danger" onclick="signOut()">
@@ -1406,6 +1405,7 @@
         function saveReviewList(list) {
             localStorage.setItem('review_list', JSON.stringify(list));
             updateReviewBadge();
+            autoSyncReviewList();
         }
         function addToReviewList(words) {
             const current = getReviewList();
@@ -1583,6 +1583,7 @@
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
             showToast(oldName ? `「${name}」已更新！` : `「${name}」已儲存！`);
+            autoSyncCustomLists();
         }
 
         function _resetEditForm() {
@@ -1632,12 +1633,12 @@
 
         function deleteList(e, name) {
             e.stopPropagation();
-            // 若刪除的正是正在編輯的清單，重置表單
             if (gameState.editingListName === name) _resetEditForm();
             delete gameState.customData[name];
             localStorage.setItem('user_custom_lists', JSON.stringify(gameState.customData));
             renderSavedLists();
             showToast(`「${name}」已刪除`);
+            autoSyncCustomLists();
         }
 
         function editList(e, name) {
@@ -2696,6 +2697,24 @@
             } catch (err) {
                 showToast('❌ 同步失敗：' + err.message);
             }
+        }
+
+        // ── 自動同步：自訂清單有變動時靜默存雲端 ──
+        function autoSyncCustomLists() {
+            if (!currentUser) return;
+            db.collection('users').doc(currentUser.uid).set({
+                customLists: gameState.customData,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).catch(err => console.warn('自動同步失敗:', err));
+        }
+
+        // ── 自動同步：待複習清單有變動時靜默存雲端 ──
+        function autoSyncReviewList() {
+            if (!currentUser) return;
+            db.collection('users').doc(currentUser.uid).set({
+                reviewList: getReviewList(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).catch(err => console.warn('自動同步失敗:', err));
         }
 
         // ── 從 Firestore 載入資料 ──
