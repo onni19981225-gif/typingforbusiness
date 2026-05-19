@@ -119,7 +119,7 @@
             z-index: 1500;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 讓子元素負責滾動 */
+            overflow: visible; /* 讓帳戶 popup 不被裁切 */
         }
         #sidebar.open { left: 0; }
         
@@ -1129,8 +1129,17 @@
         <div class="modal-content">
             <h3 style="color: #e74c3c; font-size: 1.8rem; margin-top: 0;">📌 待複習清單</h3>
             <p style="color: var(--text-muted); font-size: 0.95rem;">每次考試答錯的單字會自動加到這裡</p>
-            <div id="review-list-display" style="max-height: 300px; overflow-y: auto; -webkit-overflow-scrolling: touch; text-align: left; margin: 10px 0;"></div>
-            <button class="btn" style="background: #FFE8E8; color:#c0392b; box-shadow: 0 4px 0 #f5b7b1;" onclick="startReviewPractice()">🚀 開始複習</button>
+            <div style="display:flex; justify-content:flex-end; margin-bottom:6px;">
+                <button onclick="clearAllReview()" style="background:none; border:1.5px solid #e74c3c; color:#e74c3c; border-radius:10px; padding:5px 14px; font-size:0.9rem; cursor:pointer; font-family:inherit; font-weight:bold; transition:0.15s;" onmouseover="this.style.background='#FFE8E8'" onmouseout="this.style.background='none'">🗑️ 清空全部</button>
+            </div>
+            <div id="review-list-display" style="max-height: 240px; overflow-y: auto; -webkit-overflow-scrolling: touch; text-align: left; margin: 0 0 10px 0;"></div>
+            <hr style="margin: 10px 0; border: 0.5px solid var(--card-border);">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:1rem; font-weight:bold; color:var(--text-muted);">
+                設定練習次數：<input type="number" id="review-repeat-count" value="1" min="1" style="width:70px; text-align:center; font-size:1.1rem;">
+            </div>
+            <button class="btn" style="background: #E2F0CB; color:#4A7C6E; box-shadow:0 4px 0 #95CBB9;" onclick="startReviewPractice('practice')">📖 基礎練習</button>
+            <button class="btn" style="background: var(--accent); color:#855b3f; box-shadow:0 4px 0 #e6c5ae;" onclick="startReviewPractice('test')">📝 拼字練習</button>
+            <button class="btn" style="background: #FFE8E8; color:#c0392b; box-shadow: 0 4px 0 #f5b7b1;" onclick="startReviewPractice('exam')">🎓 考試模式</button>
             <button class="btn" style="background:#eee; margin-top:10px; color: #888; box-shadow: 0 4px 0 #ccc;" onclick="hideModal('review-modal')">關閉</button>
         </div>
     </div>
@@ -1390,6 +1399,7 @@
                 renderSavedLists();
                 document.getElementById('io-textarea').value = '';
                 alert(`✅ 匯入成功！共 ${Object.keys(parsed).length} 份清單。`);
+                autoSyncCustomLists();
             } catch(e) {
                 alert('格式錯誤，請確認資料是正確的 JSON 格式。');
             }
@@ -1455,24 +1465,46 @@
             saveReviewList(list);
             renderReviewList();
         }
-        function startReviewPractice() {
+        function clearAllReview() {
+            const list = getReviewList();
+            if (list.length === 0) return showToast('清單已經是空的！');
+            if (!confirm(`確定要清空全部 ${list.length} 個待複習單字嗎？`)) return;
+            saveReviewList([]);
+            renderReviewList();
+            showToast('✅ 已清空待複習清單');
+        }
+        function startReviewPractice(type) {
             const list = getReviewList();
             if (list.length === 0) return alert('待複習清單是空的！');
+            type = type || 'exam';
+            const repeat = parseInt(document.getElementById('review-repeat-count').value) || 1;
             hideModal('review-modal');
             gameState.tempDictionary = {};
             gameState.currentList = [];
             list.forEach(item => {
-                gameState.tempDictionary[item.eng] = item.chi;
-                gameState.currentList.push(item.eng);
+                const key = item.eng.toLowerCase();
+                gameState.tempDictionary[key] = item.chi;
+                for (let i = 0; i < repeat; i++) gameState.currentList.push(key);
             });
+            // 拼字/考試模式隨機打亂
+            if (type === 'exam' || type === 'test') {
+                for (let i = gameState.currentList.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [gameState.currentList[i], gameState.currentList[j]] = [gameState.currentList[j], gameState.currentList[i]];
+                }
+            }
             gameState.examErrors = [];
-            gameState.testMode = true;
-            gameState.examMode = true;
+            gameState.testMode = (type === 'test' || type === 'exam');
+            gameState.examMode = (type === 'exam');
+            gameState.repeatCount = repeat;
             gameState.activeListName = '待複習清單';
             clearUI();
             gameState.mode = 'word'; gameState.subMode = 'custom';
-            document.getElementById('pre-title').innerText = '📌 待複習清單練習';
-            document.getElementById('pre-desc').innerText = `共 ${list.length} 個單字，加油！`;
+            let title = "📖 基礎練習";
+            if (type === 'test') title = "📝 拼字練習";
+            if (type === 'exam') title = "🎓 考試模式";
+            document.getElementById('pre-title').innerText = '📌 待複習清單 — ' + title;
+            document.getElementById('pre-desc').innerText = `共 ${list.length} 個單字 × ${repeat} 次 = ${gameState.currentList.length} 題，加油！`;
             document.getElementById('pre-game-start').style.display = 'block';
         }
 
@@ -1614,7 +1646,7 @@
                     <span class="list-item-label" title="${name}">📂 ${name} <span style="color:var(--text-muted);font-weight:normal;">${count}字</span></span>
                     <span class="list-item-actions">
                         <button class="list-action-btn" title="編輯">✏️</button>
-                        <button class="list-action-btn del" title="刪除">✕</button>
+                        <button class="list-action-btn del" title="刪除">🗑️</button>
                     </span>
                 `;
                 item.querySelector('.list-action-btn').addEventListener('click', (e) => { e.stopPropagation(); editList(e, name); });
@@ -1633,6 +1665,7 @@
 
         function deleteList(e, name) {
             e.stopPropagation();
+            if (!confirm(`確定要刪除「${name}」嗎？`)) return;
             if (gameState.editingListName === name) _resetEditForm();
             delete gameState.customData[name];
             localStorage.setItem('user_custom_lists', JSON.stringify(gameState.customData));
@@ -2675,7 +2708,8 @@
             if (!newName) { document.getElementById('rename-error').textContent = '請輸入暱稱'; return; }
             currentUser.updateProfile({ displayName: newName })
                 .then(() => {
-                    updateAccountChip(currentUser);
+                    // updateProfile 是同步更新 currentUser 物件，直接重新讀取
+                    updateAccountChip(auth.currentUser);
                     hideModal('rename-modal');
                     showToast('✅ 暱稱已更新為「' + newName + '」');
                 })
@@ -2728,7 +2762,9 @@
                         localStorage.setItem('user_custom_lists', JSON.stringify(gameState.customData));
                     }
                     if (data.reviewList) {
-                        saveReviewList(data.reviewList);
+                        // 直接寫 localStorage，不走 saveReviewList 避免觸發 autoSync 回寫雲端
+                        localStorage.setItem('review_list', JSON.stringify(data.reviewList));
+                        updateReviewBadge();
                     }
                     showToast('☁️ 雲端資料已載入');
                 }
