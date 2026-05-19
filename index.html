@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小亞諾英文單字王</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAuUA_CztaFGRDtHOx0DUPZKfxPbojlKw",
+            authDomain: "arnotyping.firebaseapp.com",
+            projectId: "arnotyping",
+            storageBucket: "arnotyping.firebasestorage.app",
+            messagingSenderId: "1059523653198",
+            appId: "1:1059523653198:web:de5f241583c4ddcdf65d1f"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
     <style>
         :root {
             --primary: #3B7FB9; 
@@ -108,10 +125,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            padding-top: 80px; /* 讓漢堡按鈕不擋到 */
+            padding: 14px 16px;
+            padding-top: 76px; /* 讓漢堡按鈕不擋到 */
             border-bottom: 1px solid var(--card-border);
-            color: var(--primary);
             flex-shrink: 0;
         }
         .home-icon-btn {
@@ -121,8 +137,117 @@
             border-radius: 10px;
             transition: 0.2s;
             touch-action: manipulation;
+            border: none;
+            background: none;
         }
         .home-icon-btn:hover { background: var(--card-border); transform: scale(1.1); }
+
+        /* ══ 帳戶 Chip ══ */
+        .account-chip {
+            display: flex; align-items: center; gap: 7px;
+            cursor: pointer; padding: 6px 10px;
+            border-radius: 20px;
+            border: 1.5px solid var(--card-border);
+            background: var(--bg);
+            transition: background 0.15s, border-color 0.15s;
+            max-width: 175px;
+            touch-action: manipulation;
+        }
+        .account-chip:hover { background: var(--card-border); }
+        .acct-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: #B5D4F4; display: flex; align-items: center;
+            justify-content: center; font-size: 11px; font-weight: bold;
+            color: #0C447C; flex-shrink: 0;
+            font-family: 'Microsoft JhengHei', sans-serif;
+        }
+        .acct-avatar.guest { background: var(--card-border); color: var(--text-muted); font-size: 16px; }
+        .acct-chip-name {
+            font-size: 12px; font-weight: bold; color: var(--text-main);
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            max-width: 90px;
+        }
+        .acct-chip-arrow { font-size: 10px; color: var(--text-muted); }
+
+        /* ══ 帳戶小視窗 ══ */
+        #account-popup {
+            display: none;
+            position: absolute;
+            top: 120px; left: 16px; width: 252px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            z-index: 1800;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #account-popup.show { display: flex; }
+        body.dark #account-popup { box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+
+        .popup-header-section {
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .popup-avatar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .popup-avatar-big {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: #B5D4F4; display: flex; align-items: center;
+            justify-content: center; font-size: 15px; font-weight: bold;
+            color: #0C447C; flex-shrink: 0;
+            font-family: 'Microsoft JhengHei', sans-serif;
+        }
+        .popup-uname { font-size: 14px; font-weight: bold; color: var(--text-main); }
+        .popup-email { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .plan-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 10px; border-radius: 99px;
+            font-size: 11px; font-weight: bold;
+            background: #FAEEDA; color: #854F0B;
+        }
+        body.dark .plan-badge { background: #3a2e1a; color: #EF9F27; }
+
+        .popup-section {
+            padding: 5px 8px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .popup-section:last-child { border-bottom: none; }
+        .popup-item {
+            display: flex; align-items: center; gap: 9px;
+            padding: 9px 9px; border-radius: 10px;
+            font-size: 13px; color: var(--text-main);
+            cursor: pointer; border: none; background: none;
+            width: 100%; text-align: left;
+            font-family: inherit; transition: background 0.15s;
+        }
+        .popup-item:hover { background: var(--bg); }
+        .popup-item .pi-icon { font-size: 17px; flex-shrink: 0; }
+        .popup-item .pi-sub { font-size: 10px; color: var(--text-muted); display: block; margin-top: 1px; font-weight: normal; }
+        .popup-item.upgrade { color: #854F0B; font-weight: bold; }
+        .popup-item.upgrade .pi-sub { color: #BA7517; }
+        body.dark .popup-item.upgrade { color: #EF9F27; }
+        .popup-item.danger { color: #c0392b; }
+        body.dark .popup-item.danger { color: #e74c3c; }
+
+        /* 未登入視窗 */
+        .login-popup-btn {
+            width: 100%; padding: 10px; border-radius: 12px;
+            font-size: 13px; font-weight: bold; cursor: pointer;
+            font-family: inherit; transition: 0.15s;
+        }
+        .login-popup-btn.google {
+            background: #3B7FB9; color: #fff; border: none;
+        }
+        .login-popup-btn.google:hover { background: #2e6494; }
+        .login-popup-btn.email {
+            background: none; color: var(--text-main);
+            border: 1.5px solid var(--card-border);
+        }
+        .login-popup-btn.email:hover { background: var(--bg); }
+        .login-popup-btn.guest-continue {
+            background: none; color: var(--text-muted);
+            border: none; font-size: 12px; font-weight: normal;
+        }
 
         /* ★ 修正：側邊欄內容可滾動 */
         .sidebar-content {
@@ -807,8 +932,67 @@
 
     <div id="sidebar">
         <div class="sidebar-header">
-            <span style="font-weight: bold; color: var(--primary);">🐳 冒險選單</span>
-            <span class="home-icon-btn" onclick="location.reload()">🏠</span>
+            <div class="account-chip" id="account-chip" onclick="toggleAccountPopup()">
+                <div class="acct-avatar guest" id="acct-avatar">👤</div>
+                <span class="acct-chip-name" id="acct-chip-name">登入帳戶</span>
+                <span class="acct-chip-arrow">▾</span>
+            </div>
+            <button class="home-icon-btn" onclick="location.reload()" title="回到主畫面">🏠</button>
+        </div>
+
+        <!-- 帳戶小視窗 -->
+        <div id="account-popup">
+            <!-- 已登入內容 -->
+            <div id="popup-logged" style="display:none; flex-direction:column;">
+                <div class="popup-header-section">
+                    <div class="popup-avatar-row">
+                        <div class="popup-avatar-big" id="popup-avatar-big">?</div>
+                        <div>
+                            <div class="popup-uname" id="popup-uname">使用者</div>
+                            <div class="popup-email" id="popup-email">載入中...</div>
+                        </div>
+                    </div>
+                    <span class="plan-badge">⭐ 免費版</span>
+                </div>
+                <div class="popup-section">
+                    <button class="popup-item upgrade" onclick="alert('升級功能即將推出！')">
+                        <span class="pi-icon">🚀</span>
+                        <span>升級 Pro 會員<span class="pi-sub">雲端同步・無限單字庫・進階統計</span></span>
+                    </button>
+                </div>
+                <div class="popup-section">
+                    <button class="popup-item" onclick="showRenameModal()">
+                        <span class="pi-icon">✏️</span><span>修改暱稱</span>
+                    </button>
+                    <button class="popup-item" onclick="alert('變更密碼功能即將推出！')">
+                        <span class="pi-icon">🔒</span><span>變更密碼</span>
+                    </button>
+                    <button class="popup-item" onclick="alert('學習統計功能即將推出！')">
+                        <span class="pi-icon">📊</span><span>學習統計</span>
+                    </button>
+                    <button class="popup-item" onclick="syncToCloud()">
+                        <span class="pi-icon">☁️</span>
+                        <span>備份與同步<span class="pi-sub">手動同步到雲端</span></span>
+                    </button>
+                </div>
+                <div class="popup-section">
+                    <button class="popup-item danger" onclick="signOut()">
+                        <span class="pi-icon">🚪</span><span>登出</span>
+                    </button>
+                </div>
+            </div>
+            <!-- 未登入內容 -->
+            <div id="popup-guest" style="display:flex; flex-direction:column;">
+                <div style="padding:14px 16px 12px; border-bottom:1px solid var(--card-border);">
+                    <div style="font-size:14px; font-weight:bold; color:var(--text-main); margin-bottom:4px;">👋 歡迎來到小亞諾！</div>
+                    <div style="font-size:11px; color:var(--text-muted);">登入後可跨裝置同步資料</div>
+                </div>
+                <div style="padding:10px 10px; display:flex; flex-direction:column; gap:7px;">
+                    <button class="login-popup-btn google" onclick="signInWithGoogle()">🔑 Google 帳號登入</button>
+                    <button class="login-popup-btn email" onclick="showEmailLoginModal()">📧 Email 登入 / 註冊</button>
+                    <button class="login-popup-btn guest-continue" onclick="closeAccountPopup()">繼續使用（不登入）</button>
+                </div>
+            </div>
         </div>
         <div class="sidebar-content">
             <div id="sound-toggle-wrap">
@@ -990,6 +1174,34 @@
             <button class="btn" style="width:180px; background:#ddd; color: #666; box-shadow: 0 4px 0 #bbb;" onclick="location.reload()">回到主畫面</button>
         </div>
         <div id="share-feedback" style="color: var(--correct); font-size:1rem; margin-top:10px; min-height: 1.5rem;"></div>
+    </div>
+
+    <!-- Email 登入 / 註冊 Modal -->
+    <div id="email-login-modal" class="modal">
+        <div class="modal-content" style="max-width:420px;">
+            <h3 style="color:var(--primary); margin-top:0; font-size:1.6rem;" id="email-modal-title">📧 登入帳戶</h3>
+            <div id="email-modal-tabs" style="display:flex; gap:8px; margin-bottom:18px;">
+                <button class="btn" id="tab-login-btn" style="flex:1; padding:10px; font-size:1rem;" onclick="switchEmailTab('login')">登入</button>
+                <button class="btn" id="tab-register-btn" style="flex:1; padding:10px; font-size:1rem; background:#eee; color:#888; box-shadow:0 4px 0 #ccc;" onclick="switchEmailTab('register')">註冊</button>
+            </div>
+            <input type="email" id="email-input" placeholder="電子郵件" style="width:100%; padding:12px; border-radius:12px; border:2px solid var(--primary); font-size:1rem; font-family:inherit; background:var(--input-bg); color:var(--text-main); margin-bottom:10px;">
+            <input type="password" id="password-input" placeholder="密碼" style="width:100%; padding:12px; border-radius:12px; border:2px solid var(--primary); font-size:1rem; font-family:inherit; background:var(--input-bg); color:var(--text-main); margin-bottom:6px;">
+            <input type="text" id="displayname-input" placeholder="暱稱（例：小亞諾同學）" style="width:100%; padding:12px; border-radius:12px; border:2px solid var(--primary); font-size:1rem; font-family:inherit; background:var(--input-bg); color:var(--text-main); margin-bottom:10px; display:none;">
+            <div id="email-modal-error" style="color:#e74c3c; font-size:0.9rem; min-height:1.2rem; margin-bottom:6px;"></div>
+            <button class="btn" id="email-modal-submit" onclick="submitEmailAuth()" style="font-size:1.1rem;">登入</button>
+            <button class="btn" style="background:#eee; color:#888; box-shadow:0 4px 0 #ccc; margin-top:8px;" onclick="hideModal('email-login-modal')">取消</button>
+        </div>
+    </div>
+
+    <!-- 修改暱稱 Modal -->
+    <div id="rename-modal" class="modal">
+        <div class="modal-content" style="max-width:380px;">
+            <h3 style="color:var(--primary); margin-top:0; font-size:1.5rem;">✏️ 修改暱稱</h3>
+            <input type="text" id="rename-input" placeholder="輸入新暱稱" style="width:100%; padding:12px; border-radius:12px; border:2px solid var(--primary); font-size:1rem; font-family:inherit; background:var(--input-bg); color:var(--text-main); margin-bottom:10px;">
+            <div id="rename-error" style="color:#e74c3c; font-size:0.9rem; min-height:1.2rem; margin-bottom:6px;"></div>
+            <button class="btn" onclick="submitRename()" style="font-size:1.1rem;">確認修改</button>
+            <button class="btn" style="background:#eee; color:#888; box-shadow:0 4px 0 #ccc; margin-top:8px;" onclick="hideModal('rename-modal')">取消</button>
+        </div>
     </div>
 
     <script>
@@ -2301,6 +2513,208 @@
                 setTimeout(() => document.getElementById('sentence-input-box').focus(), 100);
             } else {
                 endGame();
+            }
+        }
+
+        // ════════════════════════════════
+        //  帳戶管理（Firebase）
+        // ════════════════════════════════
+
+        let currentUser = null;
+
+        // 監聽登入狀態變化（頁面載入就自動執行）
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            updateAccountChip(user);
+            if (user) {
+                await loadFromCloud(user);
+            }
+        });
+
+        function toggleAccountPopup() {
+            document.getElementById('account-popup').classList.toggle('show');
+        }
+        function closeAccountPopup() {
+            document.getElementById('account-popup').classList.remove('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const popup = document.getElementById('account-popup');
+            const chip = document.getElementById('account-chip');
+            if (popup.classList.contains('show') && !popup.contains(e.target) && !chip.contains(e.target)) {
+                closeAccountPopup();
+            }
+        });
+
+        function updateAccountChip(user) {
+            const avatar = document.getElementById('acct-avatar');
+            const chipName = document.getElementById('acct-chip-name');
+            if (user) {
+                const displayName = user.displayName || user.email.split('@')[0];
+                const initials = displayName.slice(0, 2);
+                avatar.textContent = initials;
+                avatar.classList.remove('guest');
+                chipName.textContent = displayName;
+                document.getElementById('popup-avatar-big').textContent = initials;
+                document.getElementById('popup-uname').textContent = displayName;
+                document.getElementById('popup-email').textContent = user.email || '';
+                document.getElementById('popup-logged').style.display = 'flex';
+                document.getElementById('popup-guest').style.display = 'none';
+            } else {
+                avatar.textContent = '👤';
+                avatar.classList.add('guest');
+                chipName.textContent = '登入帳戶';
+                document.getElementById('popup-logged').style.display = 'none';
+                document.getElementById('popup-guest').style.display = 'flex';
+            }
+        }
+
+        // ── Google 登入 ──
+        function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    closeAccountPopup();
+                    showToast('✅ 歡迎，' + (result.user.displayName || result.user.email) + '！');
+                })
+                .catch((err) => {
+                    showToast('❌ 登入失敗：' + err.message);
+                });
+        }
+
+        // ── 登出 ──
+        function signOut() {
+            auth.signOut().then(() => {
+                closeAccountPopup();
+                showToast('👋 已登出');
+            });
+        }
+
+        // ── Email 登入 / 註冊 ──
+        let emailTabMode = 'login';
+
+        function showEmailLoginModal() {
+            closeAccountPopup();
+            switchEmailTab('login');
+            document.getElementById('email-input').value = '';
+            document.getElementById('password-input').value = '';
+            document.getElementById('displayname-input').value = '';
+            document.getElementById('email-modal-error').textContent = '';
+            showModal('email-login-modal');
+        }
+
+        function switchEmailTab(tab) {
+            emailTabMode = tab;
+            const isRegister = tab === 'register';
+            document.getElementById('email-modal-title').textContent = isRegister ? '📧 建立帳戶' : '📧 登入帳戶';
+            document.getElementById('email-modal-submit').textContent = isRegister ? '建立帳戶' : '登入';
+            document.getElementById('displayname-input').style.display = isRegister ? 'block' : 'none';
+            document.getElementById('tab-login-btn').style.cssText = isRegister
+                ? 'flex:1;padding:10px;font-size:1rem;background:#eee;color:#888;box-shadow:0 4px 0 #ccc;'
+                : 'flex:1;padding:10px;font-size:1rem;';
+            document.getElementById('tab-register-btn').style.cssText = isRegister
+                ? 'flex:1;padding:10px;font-size:1rem;'
+                : 'flex:1;padding:10px;font-size:1rem;background:#eee;color:#888;box-shadow:0 4px 0 #ccc;';
+        }
+
+        function submitEmailAuth() {
+            const email = document.getElementById('email-input').value.trim();
+            const password = document.getElementById('password-input').value;
+            const errorEl = document.getElementById('email-modal-error');
+            errorEl.textContent = '';
+
+            if (!email || !password) { errorEl.textContent = '請填寫 Email 和密碼'; return; }
+
+            if (emailTabMode === 'login') {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((result) => {
+                        hideModal('email-login-modal');
+                        showToast('✅ 歡迎回來，' + (result.user.displayName || email) + '！');
+                    })
+                    .catch((err) => {
+                        const msgMap = {
+                            'auth/user-not-found': '找不到此帳號',
+                            'auth/wrong-password': '密碼錯誤',
+                            'auth/invalid-email': 'Email 格式不正確',
+                            'auth/invalid-credential': 'Email 或密碼錯誤',
+                        };
+                        errorEl.textContent = '❌ ' + (msgMap[err.code] || err.message);
+                    });
+            } else {
+                const displayName = document.getElementById('displayname-input').value.trim() || email.split('@')[0];
+                if (password.length < 6) { errorEl.textContent = '密碼至少需要 6 個字元'; return; }
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((result) => {
+                        return result.user.updateProfile({ displayName }).then(() => result.user);
+                    })
+                    .then((user) => {
+                        hideModal('email-login-modal');
+                        showToast('🎉 帳號建立成功，歡迎 ' + displayName + '！');
+                    })
+                    .catch((err) => {
+                        const msgMap = {
+                            'auth/email-already-in-use': '此 Email 已被註冊',
+                            'auth/invalid-email': 'Email 格式不正確',
+                            'auth/weak-password': '密碼強度不足',
+                        };
+                        errorEl.textContent = '❌ ' + (msgMap[err.code] || err.message);
+                    });
+            }
+        }
+
+        // ── 修改暱稱 ──
+        function showRenameModal() {
+            closeAccountPopup();
+            document.getElementById('rename-input').value = currentUser?.displayName || '';
+            document.getElementById('rename-error').textContent = '';
+            showModal('rename-modal');
+        }
+        function submitRename() {
+            const newName = document.getElementById('rename-input').value.trim();
+            if (!newName) { document.getElementById('rename-error').textContent = '請輸入暱稱'; return; }
+            currentUser.updateProfile({ displayName: newName })
+                .then(() => {
+                    updateAccountChip(currentUser);
+                    hideModal('rename-modal');
+                    showToast('✅ 暱稱已更新為「' + newName + '」');
+                })
+                .catch((err) => {
+                    document.getElementById('rename-error').textContent = '❌ ' + err.message;
+                });
+        }
+
+        // ── 雲端同步：存到 Firestore ──
+        async function syncToCloud() {
+            if (!currentUser) { showToast('請先登入！'); return; }
+            try {
+                await db.collection('users').doc(currentUser.uid).set({
+                    customLists: gameState.customData,
+                    reviewList: getReviewList(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                showToast('☁️ 已同步到雲端！');
+            } catch (err) {
+                showToast('❌ 同步失敗：' + err.message);
+            }
+        }
+
+        // ── 從 Firestore 載入資料 ──
+        async function loadFromCloud(user) {
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.customLists) {
+                        gameState.customData = data.customLists;
+                        localStorage.setItem('user_custom_lists', JSON.stringify(gameState.customData));
+                    }
+                    if (data.reviewList) {
+                        saveReviewList(data.reviewList);
+                    }
+                    showToast('☁️ 雲端資料已載入');
+                }
+            } catch (err) {
+                console.warn('載入雲端資料失敗：', err);
             }
         }
 
