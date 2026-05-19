@@ -324,8 +324,32 @@
             font-size: 1rem; font-weight: bold; color: var(--text-muted);
             margin-top: 4px;
         }
-        #timer-display { font-size: 2rem; font-weight: bold; color: #FF6B6B; display: none; }
-        #counter-display { font-size: 2rem; font-weight: bold; color: #3B7FB9; display: none; }
+        /* 倒數：固定右上角 */
+        #timer-display {
+            position: fixed; top: 18px; right: 80px;
+            font-size: 1.6rem; font-weight: bold; color: #FF6B6B;
+            display: none;
+            background: var(--card-bg);
+            border: 2px solid #FF6B6B;
+            border-radius: 20px;
+            padding: 4px 16px;
+            box-shadow: 0 2px 8px rgba(255,107,107,0.15);
+            z-index: 200;
+            pointer-events: none;
+        }
+        /* 計分：固定左上角（避開漢堡按鈕） */
+        #counter-display {
+            position: fixed; top: 18px; left: 85px;
+            font-size: 1.6rem; font-weight: bold; color: #3B7FB9;
+            display: none;
+            background: var(--card-bg);
+            border: 2px solid #3B7FB9;
+            border-radius: 20px;
+            padding: 4px 16px;
+            box-shadow: 0 2px 8px rgba(59,127,185,0.15);
+            z-index: 200;
+            pointer-events: none;
+        }
 
         #word-area { text-align: center; width: 100%; display: none; }
         
@@ -690,7 +714,8 @@
         /* ══ Combo 連擊提示 ══ */
         #combo-display {
             position: fixed;
-            top: 80px; right: 20px;
+            top: 50%; right: 20px;
+            transform: translateY(-50%);
             font-size: 2rem;
             font-weight: 900;
             color: #FF6B35;
@@ -701,9 +726,9 @@
         }
         #combo-display.pop { animation: comboPop 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
         @keyframes comboPop {
-            0%   { transform: scale(1); }
-            40%  { transform: scale(1.5) rotate(-5deg); }
-            100% { transform: scale(1); }
+            0%   { transform: translateY(-50%) scale(1); }
+            40%  { transform: translateY(-50%) scale(1.5) rotate(-5deg); }
+            100% { transform: translateY(-50%) scale(1); }
         }
 
         /* ══ 答對綠色閃光 ══ */
@@ -775,7 +800,7 @@
         #hint-btn:hover { border-color: var(--primary); color: var(--primary); }
 
         /* ══ 計時器緊急狀態 ══ */
-        #timer-display.urgent { color: #FF2D2D !important; animation: urgentPulse 0.5s infinite alternate; }
+        #timer-display.urgent { color: #FF2D2D !important; animation: urgentPulse 0.5s infinite alternate; transform-origin: right center; }
         @keyframes urgentPulse { from { transform: scale(1); } to { transform: scale(1.1); } }
 
         /* ══ 結果層淡入 ══ */
@@ -2433,9 +2458,11 @@
                         const target = sentence[i];
                         const typed  = val[i];
                         // 字母：大小寫不分；標點/空格：完全一致
-                        const ok = typed === target;
+                        const isLetter = /[a-zA-Z]/.test(target);
+                        const ok = isLetter ? typed.toLowerCase() === target.toLowerCase() : typed === target;
                         if (ok) {
-                            validated += typed;
+                            // 強制存目標大小寫，確保 Enter 送出時完全比對能過
+                            validated += target;
                         } else {
                             // 打錯：先截斷 → render → 再 bounce 才找得到格子
                             sInput.value = validated;
