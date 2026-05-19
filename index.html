@@ -1113,11 +1113,11 @@
             <button onclick="hideModal('custom-modal')" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--text-muted); line-height:1; padding:4px 8px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--card-border)'" onmouseout="this.style.background='none'">✕</button>
             <h3 style="color: var(--primary); font-size: 1.8rem; margin-top: 0;">✏️ 自訂單字庫管理</h3>
             <div id="list-creation-area">
-                <input type="text" id="new-list-name" placeholder="清單名稱 (如：第五課單字)" style="width:90%; padding:10px; margin-bottom:12px; border-radius:10px; border:2px solid var(--primary); font-size: 1rem; font-family: inherit; background: var(--input-bg); color: var(--text-main);">
+                <input type="text" id="new-list-name" placeholder="清單名稱 (如：第五課單字)" inputmode="none" style="width:90%; padding:10px; margin-bottom:12px; border-radius:10px; border:2px solid var(--primary); font-size: 1rem; font-family: inherit; background: var(--input-bg); color: var(--text-main);">
                 <div id="custom-rows-container" style="max-height: 320px; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; margin-bottom:12px; border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; background: var(--bg);">
                     <div class="word-row">
-                        <input type="text" class="eng-in" placeholder="英文">
-                        <input type="text" class="chi-in" placeholder="中文">
+                        <input type="text" class="eng-in" placeholder="英文" inputmode="none">
+                        <input type="text" class="chi-in" placeholder="中文" inputmode="none">
                         <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color:#999;">❌</button>
                     </div>
                 </div>
@@ -1175,7 +1175,7 @@
             <button onclick="hideModal('sentence-modal')" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--text-muted); line-height:1; padding:4px 8px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--card-border)'" onmouseout="this.style.background='none'">✕</button>
             <h3 style="color:#1a5276; font-size:1.8rem; margin-top:0; flex-shrink:0;">📝 句子模式</h3>
             <p style="color:var(--text-muted); font-size:0.95rem; margin:0 0 10px 0; flex-shrink:0;">貼上任意英文文章，系統自動切成句子</p>
-            <textarea id="sentence-article-box" placeholder="在這裡貼上英文文章…&#10;&#10;例：The sun rises in the east. Birds sing every morning! What a beautiful day?"></textarea>
+            <textarea id="sentence-article-box" inputmode="none" placeholder="在這裡貼上英文文章…&#10;&#10;例：The sun rises in the east. Birds sing every morning! What a beautiful day?"></textarea>
             <div id="sentence-preview"></div>
             <div style="display:flex; gap:12px; margin-top:10px; flex-shrink:0; align-items:center; flex-wrap:wrap;">
                 <span style="font-size:0.95rem; color:var(--text-muted); font-weight:bold;">練習句數：</span>
@@ -1352,7 +1352,9 @@
 
         // 離開遊戲畫面視為放棄，回首頁
         function stopGameTimer() {
-            if (!gameState.active) return; // 沒在遊戲中就不動
+            const duringCountdown = document.getElementById('countdown-overlay').classList.contains('show');
+            if (!gameState.active && !duringCountdown) return;
+            countdownAborted = true;
             clearUI();
             document.getElementById('home-logo').style.display = 'block';
         }
@@ -1617,7 +1619,7 @@
         function addNewWordRow() {
             const container = document.getElementById('custom-rows-container');
             const row = document.createElement('div'); row.className = 'word-row';
-            row.innerHTML = `<input type="text" class="eng-in" placeholder="英文"><input type="text" class="chi-in" placeholder="中文"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
+            row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" inputmode="none"><input type="text" class="chi-in" placeholder="中文" inputmode="none"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
             container.appendChild(row);
             // 自動滾到底部
             container.scrollTop = container.scrollHeight;
@@ -1655,7 +1657,7 @@
         function _resetEditForm() {
             gameState.editingListName = "";
             document.getElementById('new-list-name').value = "";
-            document.getElementById('custom-rows-container').innerHTML = `<div class="word-row"><input type="text" class="eng-in" placeholder="英文"><input type="text" class="chi-in" placeholder="中文"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button></div>`;
+            document.getElementById('custom-rows-container').innerHTML = `<div class="word-row"><input type="text" class="eng-in" placeholder="英文" inputmode="none"><input type="text" class="chi-in" placeholder="中文" inputmode="none"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button></div>`;
             document.getElementById('edit-mode-banner').style.display = 'none';
             document.getElementById('save-list-btn').textContent = '💾 儲存這份單字清單';
         }
@@ -1723,7 +1725,7 @@
             container.innerHTML = '';
             data.forEach(item => {
                 const row = document.createElement('div'); row.className = 'word-row';
-                row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" value="${item.eng.replace(/"/g,'&quot;')}"><input type="text" class="chi-in" placeholder="中文" value="${item.chi.replace(/"/g,'&quot;')}"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
+                row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" inputmode="none" value="${item.eng.replace(/"/g,'&quot;')}"><input type="text" class="chi-in" placeholder="中文" inputmode="none" value="${item.chi.replace(/"/g,'&quot;')}"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
                 container.appendChild(row);
             });
             // 滾動 modal 內容到頂部（scrollTop on modal-content）
@@ -1874,13 +1876,20 @@
             }
         }
 
+        let countdownAborted = false;
+
         function startCountdown(callback) {
+            countdownAborted = false;
             const overlay = document.getElementById('countdown-overlay');
             const numEl = document.getElementById('countdown-number');
             const label = document.getElementById('countdown-label');
             let count = 3;
             overlay.classList.add('show');
             function tick() {
+                if (countdownAborted) {
+                    overlay.classList.remove('show');
+                    return;
+                }
                 numEl.style.animation = 'none';
                 void numEl.offsetWidth;
                 numEl.style.animation = 'countPop 0.9s ease-out forwards';
@@ -1893,6 +1902,7 @@
                     numEl.textContent = '🚀';
                     label.textContent = '開始！';
                     setTimeout(() => {
+                        if (countdownAborted) { overlay.classList.remove('show'); return; }
                         overlay.classList.remove('show');
                         callback();
                     }, 600);
