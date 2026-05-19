@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>亞諾英文單字王</title>
+    <title>小亞諾英文單字王</title>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -1347,9 +1347,16 @@
             } catch(e) {}
         }
 
-        // ════════════════
         //  側邊欄
         // ════════════════
+
+        // 離開遊戲畫面視為放棄，回首頁
+        function stopGameTimer() {
+            if (!gameState.active) return; // 沒在遊戲中就不動
+            clearUI();
+            document.getElementById('home-logo').style.display = 'block';
+        }
+
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -1466,6 +1473,7 @@
             }
         }
         function showReviewModal() {
+            stopGameTimer();
             closeSidebar();
             renderReviewList();
             showModal('review-modal');
@@ -1536,9 +1544,10 @@
         // ════════════════════════════════
         //  自訂單字庫
         // ════════════════════════════════
-        function showCustomModal() { renderSavedLists(); showModal('custom-modal'); }
+        function showCustomModal() { stopGameTimer(); renderSavedLists(); showModal('custom-modal'); }
         function openRandomModal(diff) {
             if (!wordsLoaded) { alert('⏳ 單字庫載入中，請稍候再試！'); return; }
+            stopGameTimer();
             gameState.currentDifficulty = diff;
             const titleMap = { easy: "🏫 國小模式", normal: "🏛️ 國中模式", hard: "🎓 高中模式" };
             document.getElementById('random-title').innerText = titleMap[diff];
@@ -2287,6 +2296,7 @@
         // ════════════════════════════════
 
         function showSentenceModal() {
+            stopGameTimer();
             closeSidebar();
             showModal('sentence-modal');
             updateSentencePreview();
