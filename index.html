@@ -1593,9 +1593,9 @@
             gameState.sourceType = 'review';
             closeSidebar(); clearUI();
             gameState.mode = 'word'; gameState.subMode = 'custom';
-            let title = "📖 基礎練習";
-            if (type === 'test') title = "📝 拼字練習";
-            if (type === 'exam') title = "🎓 考試模式";
+            let title = "基礎練習";
+            if (type === 'test') title = "拼字練習";
+            if (type === 'exam') title = "考試模式";
             document.getElementById('pre-title').innerHTML = '📌 待複習清單<br><span style="font-size:0.7em;">' + title + '</span>';
             document.getElementById('pre-desc').innerText = `共 ${list.length} 個單字 × ${repeat} 次 = ${gameState.currentList.length} 題，加油！`;
             document.getElementById('pre-game-start').style.display = 'block';
@@ -1864,9 +1864,9 @@
             closeSidebar(); clearUI();
             gameState.mode = 'word'; gameState.subMode = 'custom';
             gameState.sourceType = 'custom';
-            let title = "📖 基礎練習";
-            if (type==='test') title = "📝 拼字練習";
-            if (type==='exam') title = "🎓 考試模式";
+            let title = "基礎練習";
+            if (type==='test') title = "拼字練習";
+            if (type==='exam') title = "考試模式";
             document.getElementById('pre-title').innerText = title;
             document.getElementById('pre-desc').innerText = `清單：${gameState.activeListName}，共 ${gameState.currentList.length} 個單字。`;
             document.getElementById('pre-game-start').style.display = 'block';
@@ -2280,9 +2280,9 @@
             if (!src || src === '') { area.style.display = 'none'; return; }
 
             const modes = [
-                { type: 'practice', label: '📖 基礎練習', bg: 'var(--secondary)', color: '#4A7C6E', shadow: '#95CBB9' },
-                { type: 'test',     label: '📝 拼字練習', bg: 'var(--accent)',    color: '#855b3f', shadow: '#e6c5ae' },
-                { type: 'exam',     label: '🎓 考試模式', bg: '#D2E8F7',          color: '#3B7FB9', shadow: '#B2CDDE' },
+                { type: 'practice', label: '基礎練習', bg: 'var(--secondary)', color: '#4A7C6E', shadow: '#95CBB9' },
+                { type: 'test',     label: '拼字練習', bg: 'var(--accent)',    color: '#855b3f', shadow: '#e6c5ae' },
+                { type: 'exam',     label: '考試模式', bg: '#D2E8F7',          color: '#3B7FB9', shadow: '#B2CDDE' },
             ];
 
             btnsEl.innerHTML = '';
@@ -2326,7 +2326,7 @@
                 clearUI();
                 gameState.mode = 'word'; gameState.subMode = 'custom'; gameState.sourceType = 'custom';
                 gameState.pendingTimeLeft = 0;
-                let title = type === 'exam' ? '🎓 考試模式' : type === 'test' ? '📝 拼字練習' : '📖 基礎練習';
+                let title = type === 'exam' ? '考試模式' : type === 'test' ? '拼字練習' : '基礎練習';
                 document.getElementById('pre-title').innerText = title;
                 document.getElementById('pre-desc').innerText = `清單：${gameState.activeListName}，共 ${gameState.currentList.length} 個單字。`;
                 document.getElementById('pre-game-start').style.display = 'block';
@@ -2354,7 +2354,7 @@
                 clearUI();
                 gameState.mode = 'word'; gameState.subMode = 'custom'; gameState.sourceType = 'review';
                 gameState.pendingTimeLeft = 0;
-                let title = type === 'exam' ? '🎓 考試模式' : type === 'test' ? '📝 拼字練習' : '📖 基礎練習';
+                let title = type === 'exam' ? '考試模式' : type === 'test' ? '拼字練習' : '基礎練習';
                 document.getElementById('pre-title').innerHTML = '📌 待複習清單<br><span style="font-size:0.7em;">' + title + '</span>';
                 document.getElementById('pre-desc').innerText = `共 ${gameState.currentList.length} 題，加油！`;
                 document.getElementById('pre-game-start').style.display = 'block';
@@ -2377,7 +2377,7 @@
                 clearUI();
                 gameState.mode = 'word'; gameState.subMode = 'sentence'; gameState.sourceType = 'sentence';
                 gameState.pendingTimeLeft = 0;
-                let title = type === 'exam' ? '🎓 句子考試模式' : type === 'test' ? '📝 句子拼字練習' : '📖 句子基礎練習';
+                let title = type === 'exam' ? '句子考試模式' : type === 'test' ? '句子拼字練習' : '句子基礎練習';
                 document.getElementById('pre-title').innerText = title;
                 document.getElementById('pre-desc').innerText = `共 ${gameState.currentList.length} 個句子，準備好了嗎？`;
                 document.getElementById('pre-game-start').style.display = 'block';
@@ -2588,9 +2588,9 @@
             gameState.mode = 'word'; gameState.subMode = 'sentence';
             gameState.pendingTimeLeft = 0; // 句子模式無計時
 
-            let title = '📖 句子基礎練習';
-            if (type === 'test') title = '📝 句子拼字練習';
-            if (type === 'exam') title = '🎓 句子考試模式';
+            let title = '句子基礎練習';
+            if (type === 'test') title = '句子拼字練習';
+            if (type === 'exam') title = '句子考試模式';
             document.getElementById('pre-title').innerText = title;
             document.getElementById('pre-desc').innerText = `共 ${gameState.currentList.length} 個句子，準備好了嗎？`;
             document.getElementById('pre-game-start').style.display = 'block';
@@ -3014,23 +3014,55 @@
             }, { merge: true }).catch(err => console.warn('自動同步失敗:', err));
         }
 
-        // ── 從 Firestore 載入資料 ──
+        // ── 從 Firestore 載入並合併資料 ──
         async function loadFromCloud(user) {
             try {
                 const doc = await db.collection('users').doc(user.uid).get();
+
+                // 讀取 local 現有資料
+                const localLists = gameState.customData || {};
+                const localReview = getReviewList();
+
+                let cloudLists = {};
+                let cloudReview = [];
+                let cloudHasData = false;
+
                 if (doc.exists) {
                     const data = doc.data();
-                    if (data.customLists) {
-                        gameState.customData = data.customLists;
-                        localStorage.setItem('user_custom_lists', JSON.stringify(gameState.customData));
-                    }
-                    if (data.reviewList) {
-                        // 直接寫 localStorage，不走 saveReviewList 避免觸發 autoSync 回寫雲端
-                        localStorage.setItem('review_list', JSON.stringify(data.reviewList));
-                        updateReviewBadge();
-                    }
-                    showToast('☁️ 雲端資料已載入');
+                    if (data.customLists) { cloudLists = data.customLists; cloudHasData = true; }
+                    if (data.reviewList)  { cloudReview = data.reviewList;  cloudHasData = true; }
                 }
+
+                // ── 合併自訂清單：local 優先（同名保留 local），雲端獨有的補進來 ──
+                const mergedLists = Object.assign({}, cloudLists, localLists);
+
+                // ── 合併待複習：union 去重複（以 word 為 key）──
+                const reviewMap = {};
+                [...cloudReview, ...localReview].forEach(item => {
+                    const key = (item.word || item).toLowerCase();
+                    if (!reviewMap[key]) reviewMap[key] = item;
+                });
+                const mergedReview = Object.values(reviewMap);
+
+                // 寫回 local + gameState
+                gameState.customData = mergedLists;
+                localStorage.setItem('user_custom_lists', JSON.stringify(mergedLists));
+                localStorage.setItem('review_list', JSON.stringify(mergedReview));
+                updateReviewBadge();
+
+                // 把合併後結果推回雲端（確保雲端也是完整的）
+                db.collection('users').doc(user.uid).set({
+                    customLists: mergedLists,
+                    reviewList: mergedReview,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).catch(err => console.warn('合併後同步失敗:', err));
+
+                if (cloudHasData) {
+                    showToast('☁️ 雲端資料已合併');
+                } else {
+                    showToast('☁️ 本機資料已上傳至雲端');
+                }
+
             } catch (err) {
                 console.warn('載入雲端資料失敗：', err);
             }
