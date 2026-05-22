@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小亞諾英文單字王</title>
+    <!-- html2canvas for screenshot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -1218,9 +1220,8 @@
             <div id="switch-mode-btns" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:420px; margin:0 auto;"></div>
         </div>
         <div style="display:flex; gap:15px; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
-            <button class="btn" style="width:180px;" onclick="actualStartGame()">再挑戰一次</button>
             <button id="re-test-errors-btn" class="btn" style="width:180px; background: var(--accent); display:none;" onclick="startErrorReTest()">僅測驗錯題</button>
-            <button id="share-btn" class="btn" onclick="shareResult()">📋 分享成績</button>
+            <button id="share-btn" class="btn" onclick="shareResult()">📸 截圖分享成績</button>
             <button class="btn" style="width:180px; background:#ddd; color: #666; box-shadow: 0 4px 0 #bbb;" onclick="location.reload()">回到主畫面</button>
         </div>
         <div id="share-feedback" style="color: var(--correct); font-size:1rem; margin-top:10px; min-height: 1.5rem;"></div>
@@ -1370,8 +1371,6 @@
 
         // 離開遊戲畫面視為放棄，回首頁
         function stopGameTimer() {
-            const duringCountdown = document.getElementById('countdown-overlay').classList.contains('show');
-            if (!gameState.active && !duringCountdown) return;
             countdownAborted = true;
             clearUI();
             document.getElementById('home-logo').style.display = 'block';
@@ -1391,8 +1390,17 @@
         // ════════════════
         //  Modal 通用
         // ════════════════
+        const SETUP_MODALS = new Set(['review-modal', 'custom-modal', 'sentence-modal', 'random-modal']);
         function hideModal(id) {
             document.getElementById(id).style.display = 'none';
+            // 設定型 modal 關掉後，若主畫面沒有任何內容，補回主畫面
+            if (SETUP_MODALS.has(id)) {
+                const mainEmpty = ['pre-game-start','word-area','sentence-area','keyboard-area','result-layer']
+                    .every(eid => document.getElementById(eid).style.display === 'none' || document.getElementById(eid).style.display === '');
+                if (mainEmpty) {
+                    document.getElementById('home-logo').style.display = 'block';
+                }
+            }
         }
         function showModal(id) {
             document.getElementById(id).style.display = 'flex';
@@ -1401,28 +1409,60 @@
         // ════════════════
         //  分享成績
         // ════════════════
-        function shareResult() {
-            let text = '';
-            const modeMap = { easy: '🏫 國小', normal: '🏛️ 國中', hard: '🎓 高中' };
-            if (gameState.mode === 'beginner') {
-                text = `🐋 小亞諾英文單字王\n⌨️ 找字母挑戰\n抓到字母：${gameState.score} 個！`;
-            } else if (gameState.subMode === 'random') {
-                text = `🐋 小亞諾英文單字王\n${modeMap[gameState.currentDifficulty] || ''} 模式\n✅ 完成單字：${gameState.score} 個！`;
-            } else {
-                const pct = gameState.currentList.length > 0 ? Math.round(gameState.score / gameState.currentList.length * 100) : 0;
-                text = `🐋 小亞諾英文單字王\n📋 清單：${gameState.activeListName || '自訂'}\n答對率：${pct}% (${gameState.score}/${gameState.currentList.length})`;
-                if (pct === 100) text += '\n💯 滿分！太厲害了！';
-            }
+        async function shareResult() {
             const feedback = document.getElementById('share-feedback');
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    feedback.textContent = '✅ 已複製到剪貼簿，快貼給同學看！';
-                    setTimeout(() => feedback.textContent = '', 3000);
-                }).catch(() => {
-                    prompt('複製這段文字分享：', text);
+            const shareBtn = document.getElementById('share-btn');
+            const resultLayer = document.getElementById('result-layer');
+
+            shareBtn.textContent = '⏳ 截圖中...';
+            shareBtn.disabled = true;
+            feedback.textContent = '';
+
+            try {
+                const canvas = await html2canvas(resultLayer, {
+                    backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#EBF5FB',
+                    scale: 2,
+                    useCORS: true,
+                    ignoreElements: el => el.id === 'share-feedback'
                 });
-            } else {
-                prompt('複製這段文字分享：', text);
+
+                // 嘗試寫入剪貼簿（現代瀏覽器）
+                let copiedToClipboard = false;
+                if (navigator.clipboard && window.ClipboardItem) {
+                    try {
+                        await new Promise((resolve, reject) => {
+                            canvas.toBlob(async blob => {
+                                try {
+                                    await navigator.clipboard.write([
+                                        new ClipboardItem({ 'image/png': blob })
+                                    ]);
+                                    copiedToClipboard = true;
+                                    resolve();
+                                } catch(e) { reject(e); }
+                            }, 'image/png');
+                        });
+                    } catch(e) {
+                        // 剪貼簿寫入失敗（例如 Safari 權限），改為下載
+                        copiedToClipboard = false;
+                    }
+                }
+
+                if (copiedToClipboard) {
+                    feedback.textContent = '✅ 截圖已複製到剪貼簿，快貼給同學看！';
+                } else {
+                    // 備用：自動下載圖片
+                    const link = document.createElement('a');
+                    link.download = '小亞諾英文單字王成績.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    feedback.textContent = '📥 截圖已下載！（瀏覽器不支援直接複製圖片）';
+                }
+                setTimeout(() => feedback.textContent = '', 4000);
+            } catch(e) {
+                feedback.textContent = '❌ 截圖失敗：' + e.message;
+            } finally {
+                shareBtn.textContent = '📸 截圖分享成績';
+                shareBtn.disabled = false;
             }
         }
 
@@ -1494,7 +1534,6 @@
         }
         function showReviewModal() {
             stopGameTimer();
-            closeSidebar();
             renderReviewList();
             showModal('review-modal');
         }
@@ -2484,7 +2523,6 @@
 
         function showSentenceModal() {
             stopGameTimer();
-            closeSidebar();
             showModal('sentence-modal');
             updateSentencePreview();
         }
