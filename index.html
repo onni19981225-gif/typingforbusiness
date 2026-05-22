@@ -459,17 +459,17 @@
             padding: 20px;
         }
         .modal-content { 
-            background: var(--card-bg); padding: 30px; border-radius: 35px;
+            background: var(--card-bg); padding: 22px 28px; border-radius: 35px;
             width: 100%; max-width: 480px; text-align: center;
             border: 10px solid var(--accent);
             font-family: 'Comic Sans MS', 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
             color: var(--text-main);
             transition: background 0.3s;
-            max-height: 90vh;           /* ★ 高度上限 */
-            overflow-y: auto;           /* ★ 內容超出時滾動 */
+            max-height: 95vh;
+            overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
-            margin: auto;               /* 垂直置中 */
+            margin: auto;
         }
 
         /* ══ 自訂單字庫 modal：放大版 ══ */
@@ -478,11 +478,11 @@
             max-width: 820px;
             width: 100%;
             height: calc(100vh - 12px);
-            padding: 20px 25px;
+            padding: 16px 20px;
             margin: auto;
             display: flex;
             flex-direction: column;
-            overflow-y: hidden;
+            overflow: hidden;
             border: 2px solid var(--accent);
             border-radius: 18px;
             position: relative;
@@ -491,10 +491,18 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            min-height: 0;
+        }
+        /* 單字輸入列容器：固定高度，內部滾動 */
+        #custom-rows-container {
+            max-height: 35vh !important;
+            overflow-y: auto !important;
         }
         #custom-modal #saved-lists-display {
             flex: 1;
             min-height: 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* 結果畫面 */
@@ -827,24 +835,24 @@
         .btn-level {
             flex: 1;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            padding: 12px 6px;
-            border-radius: 16px;
+            gap: 5px;
+            padding: 8px 4px;
+            border-radius: 12px;
             border: none;
             background: var(--secondary);
-            box-shadow: 0 4px 0 #95CBB9;
+            box-shadow: 0 3px 0 #95CBB9;
             cursor: pointer;
             font-family: inherit;
-            font-size: 1.6rem;
+            font-size: 1.1rem;
             color: #4A7C6E;
             transition: transform 0.1s, box-shadow 0.1s;
             touch-action: manipulation;
         }
         .btn-level span {
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             font-weight: bold;
             color: #4A7C6E;
         }
@@ -856,7 +864,7 @@
         #sentence-modal .modal-content {
             max-width: 820px; width: 100%;
             height: calc(100vh - 12px);
-            padding: 20px 25px;
+            padding: 16px 20px;
             margin: auto;
             display: flex; flex-direction: column;
             overflow-y: hidden;
@@ -864,7 +872,7 @@
             border-radius: 18px; position: relative;
         }
         #sentence-article-box {
-            flex: 1; min-height: 0;
+            flex: 1; min-height: 180px;
             resize: none;
             width: 100%;
             border: 2px solid var(--card-border);
@@ -1114,7 +1122,7 @@
             <h3 style="color: var(--primary); font-size: 1.8rem; margin-top: 0;">✏️ 自訂單字庫管理</h3>
             <div id="list-creation-area">
                 <input type="text" id="new-list-name" placeholder="清單名稱 (如：第五課單字)" inputmode="none" style="width:90%; padding:10px; margin-bottom:12px; border-radius:10px; border:2px solid var(--primary); font-size: 1rem; font-family: inherit; background: var(--input-bg); color: var(--text-main);">
-                <div id="custom-rows-container" style="max-height: 320px; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; margin-bottom:12px; border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; background: var(--bg);">
+                <div id="custom-rows-container" style="overflow-x: hidden; -webkit-overflow-scrolling: touch; margin-bottom:12px; border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; background: var(--bg);">
                     <div class="word-row">
                         <input type="text" class="eng-in" placeholder="英文" inputmode="none">
                         <input type="text" class="chi-in" placeholder="中文" inputmode="none">
@@ -1142,10 +1150,12 @@
             <div style="margin: 20px 0; font-size: 1.2rem; font-weight: bold; color: var(--text-muted);">
                 設定練習次數：<input type="number" id="custom-repeat-count" value="1" min="1" style="width:70px; text-align:center; font-size: 1.2rem;">
             </div>
-            <button class="btn" onclick="launchCustomMode('practice')">📖 基礎練習</button>
-            <button class="btn" style="background: var(--accent); color: #855b3f; box-shadow: 0 4px 0 #e6c5ae;" onclick="launchCustomMode('test')">📝 拼字練習</button>
-            <button class="btn" style="background: #D2E8F7; color: #3B7FB9; box-shadow: 0 4px 0 #B2CDDE;" onclick="launchCustomMode('exam')">🎓 考試模式</button>
-            <button class="btn" style="background:#eee; margin-top:10px; color: #888; box-shadow: 0 4px 0 #ccc;" onclick="hideModal('mode-select-modal')">取消</button>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;">
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem;" onclick="launchCustomMode('practice')">📖<br>基礎練習</button>
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem; background:var(--accent); color:#855b3f; box-shadow:0 4px 0 #e6c5ae;" onclick="launchCustomMode('test')">📝<br>拼字練習</button>
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem; background:#D2E8F7; color:#3B7FB9; box-shadow:0 4px 0 #B2CDDE;" onclick="launchCustomMode('exam')">🎓<br>考試模式</button>
+            </div>
+            <button class="btn" style="background:#eee; color:#888; box-shadow:0 4px 0 #ccc;" onclick="hideModal('mode-select-modal')">取消</button>
         </div>
     </div>
 
@@ -1162,10 +1172,12 @@
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:1rem; font-weight:bold; color:var(--text-muted);">
                 設定練習次數：<input type="number" id="review-repeat-count" value="1" min="1" style="width:70px; text-align:center; font-size:1.1rem;">
             </div>
-            <button class="btn" style="background: #E2F0CB; color:#4A7C6E; box-shadow:0 4px 0 #95CBB9;" onclick="startReviewPractice('practice')">📖 基礎練習</button>
-            <button class="btn" style="background: var(--accent); color:#855b3f; box-shadow:0 4px 0 #e6c5ae;" onclick="startReviewPractice('test')">📝 拼字練習</button>
-            <button class="btn" style="background: #FFE8E8; color:#c0392b; box-shadow: 0 4px 0 #f5b7b1;" onclick="startReviewPractice('exam')">🎓 考試模式</button>
-            <button class="btn" style="background:#eee; margin-top:10px; color: #888; box-shadow: 0 4px 0 #ccc;" onclick="hideModal('review-modal')">關閉</button>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px;">
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem; background:#E2F0CB; color:#4A7C6E; box-shadow:0 4px 0 #95CBB9;" onclick="startReviewPractice('practice')">📖<br>基礎練習</button>
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem; background:var(--accent); color:#855b3f; box-shadow:0 4px 0 #e6c5ae;" onclick="startReviewPractice('test')">📝<br>拼字練習</button>
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem; background:#FFE8E8; color:#c0392b; box-shadow:0 4px 0 #f5b7b1;" onclick="startReviewPractice('exam')">🎓<br>考試模式</button>
+            </div>
+            <button class="btn" style="background:#eee; color:#888; box-shadow:0 4px 0 #ccc;" onclick="hideModal('review-modal')">關閉</button>
         </div>
     </div>
 
@@ -1185,12 +1197,12 @@
             </div>
             <hr style="margin:14px 0; border:0.5px solid var(--card-border); flex-shrink:0;">
             <p style="font-size:1rem; font-weight:bold; color:var(--text-muted); margin:0 0 8px 0; flex-shrink:0;">選擇練習模式：</p>
-            <div style="display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
-                <button class="btn" onclick="launchSentenceMode('practice')">📖 基礎練習（看著打）</button>
-                <button class="btn" style="background:var(--accent); color:#855b3f; box-shadow:0 4px 0 #e6c5ae;" onclick="launchSentenceMode('test')">📝 拼字練習（遮住打）</button>
-                <button class="btn" style="background:#D2E8F7; color:#3B7FB9; box-shadow:0 4px 0 #B2CDDE;" onclick="launchSentenceMode('exam')">🎓 考試模式（直接打）</button>
-                <button class="btn" style="background:#eee; color:#888; box-shadow:0 4px 0 #ccc;" onclick="hideModal('sentence-modal')">取消</button>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; flex-shrink:0;">
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem;" onclick="launchSentenceMode('practice')">📖<br>基礎練習<br><span style="font-size:0.7rem; font-weight:normal;">看著打</span></button>
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem; background:var(--accent); color:#855b3f; box-shadow:0 4px 0 #e6c5ae;" onclick="launchSentenceMode('test')">📝<br>拼字練習<br><span style="font-size:0.7rem; font-weight:normal;">遮住打</span></button>
+                <button class="btn" style="margin:0; padding:12px 6px; font-size:0.85rem; background:#D2E8F7; color:#3B7FB9; box-shadow:0 4px 0 #B2CDDE;" onclick="launchSentenceMode('exam')">🎓<br>考試模式<br><span style="font-size:0.7rem; font-weight:normal;">直接打</span></button>
             </div>
+            <button class="btn" style="background:#eee; color:#888; box-shadow:0 4px 0 #ccc; flex-shrink:0;" onclick="hideModal('sentence-modal')">取消</button>
         </div>
     </div>
 
@@ -1200,6 +1212,11 @@
         <h2 id="result-title" style="color: var(--primary); font-size: 2.5rem;">挑戰結束！</h2>
         <div id="result-detail" style="font-size:1.6rem; line-height:2; margin-bottom:10px; font-weight: bold; color: var(--text-muted);"></div>
         <div id="exam-results-box" style="display:none;"></div>
+        <!-- 換模式區塊 -->
+        <div id="switch-mode-area" style="display:none; margin: 10px 0; text-align:center;">
+            <div style="font-size:1rem; font-weight:bold; color:var(--text-muted); margin-bottom:8px;">換個模式繼續練習同一份：</div>
+            <div id="switch-mode-btns" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:420px; margin:0 auto;"></div>
+        </div>
         <div style="display:flex; gap:15px; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
             <button class="btn" style="width:180px;" onclick="actualStartGame()">再挑戰一次</button>
             <button id="re-test-errors-btn" class="btn" style="width:180px; background: var(--accent); display:none;" onclick="startErrorReTest()">僅測驗錯題</button>
@@ -1278,7 +1295,8 @@
             customData: {}, tempDictionary: {}, testMode: false,
             examMode: false, examErrors: [], activeListName: "", editingListName: "",
             totalWords: 0,
-            pendingTimeLeft: 0  // ★ 記住這次挑戰應有的時間
+            pendingTimeLeft: 0,  // ★ 記住這次挑戰應有的時間
+            sourceType: ''   // 'custom' | 'review' | 'sentence'，供結算換模式用
         };
 
         let lastChar = '';
@@ -1533,6 +1551,7 @@
             gameState.examMode = (type === 'exam');
             gameState.repeatCount = repeat;
             gameState.activeListName = '待複習清單';
+            gameState.sourceType = 'review';
             clearUI();
             gameState.mode = 'word'; gameState.subMode = 'custom';
             let title = "📖 基礎練習";
@@ -1546,7 +1565,14 @@
         // ════════════════════════════════
         //  自訂單字庫
         // ════════════════════════════════
-        function showCustomModal() { stopGameTimer(); renderSavedLists(); showModal('custom-modal'); }
+        function showCustomModal() {
+            stopGameTimer();
+            renderSavedLists();
+            showModal('custom-modal');
+            // 對容器內所有現有列補綁事件（attachRowAutoAdd 自帶防重複）
+            const container = document.getElementById('custom-rows-container');
+            container.querySelectorAll('.word-row').forEach(row => attachRowAutoAdd(row));
+        }
         function openRandomModal(diff) {
             if (!wordsLoaded) { alert('⏳ 單字庫載入中，請稍候再試！'); return; }
             stopGameTimer();
@@ -1616,13 +1642,42 @@
             if (targetEl) targetEl.classList.add('highlight');
         }
 
+        function attachRowAutoAdd(row) {
+            if (row._autoAddBound) return; // 防止重複綁定
+            row._autoAddBound = true;
+            const engIn = row.querySelector('.eng-in');
+            const chiIn = row.querySelector('.chi-in');
+            let justTriggered = false; // 防止 keydown 與隨後的 blur 雙重觸發
+            function maybeAddRow(e) {
+                const isTabOrEnter = e.type === 'keydown' && (e.key === 'Tab' || e.key === 'Enter');
+                const isBlur = e.type === 'blur';
+                if (!isTabOrEnter && !isBlur) return;
+                if (isBlur && justTriggered) { justTriggered = false; return; }
+                const container = document.getElementById('custom-rows-container');
+                const rows = container.querySelectorAll('.word-row');
+                const isLast = rows[rows.length - 1] === row;
+                if (!isLast) return;
+                if (!engIn.value.trim() || !chiIn.value.trim()) return;
+                if (isTabOrEnter) { e.preventDefault(); justTriggered = true; }
+                addNewWordRow();
+            }
+            chiIn.addEventListener('keydown', maybeAddRow);
+            chiIn.addEventListener('blur', maybeAddRow);
+            // 英文欄按 Enter 跳到同列中文欄
+            engIn.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); chiIn.focus(); }
+            });
+        }
+
         function addNewWordRow() {
             const container = document.getElementById('custom-rows-container');
             const row = document.createElement('div'); row.className = 'word-row';
             row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" inputmode="none"><input type="text" class="chi-in" placeholder="中文" inputmode="none"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
+            attachRowAutoAdd(row);
             container.appendChild(row);
-            // 自動滾到底部
+            // 自動滾到底部並 focus 新列英文欄
             container.scrollTop = container.scrollHeight;
+            row.querySelector('.eng-in').focus();
         }
 
         function saveCustomList() {
@@ -1658,6 +1713,9 @@
             gameState.editingListName = "";
             document.getElementById('new-list-name').value = "";
             document.getElementById('custom-rows-container').innerHTML = `<div class="word-row"><input type="text" class="eng-in" placeholder="英文" inputmode="none"><input type="text" class="chi-in" placeholder="中文" inputmode="none"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button></div>`;
+            // 對重設後的初始列綁定自動新增事件
+            const container = document.getElementById('custom-rows-container');
+            attachRowAutoAdd(container.querySelector('.word-row'));
             document.getElementById('edit-mode-banner').style.display = 'none';
             document.getElementById('save-list-btn').textContent = '💾 儲存這份單字清單';
         }
@@ -1726,6 +1784,7 @@
             data.forEach(item => {
                 const row = document.createElement('div'); row.className = 'word-row';
                 row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" inputmode="none" value="${item.eng.replace(/"/g,'&quot;')}"><input type="text" class="chi-in" placeholder="中文" inputmode="none" value="${item.chi.replace(/"/g,'&quot;')}"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
+                attachRowAutoAdd(row);
                 container.appendChild(row);
             });
             // 滾動 modal 內容到頂部（scrollTop on modal-content）
@@ -1765,6 +1824,7 @@
             hideModal('custom-modal');
             closeSidebar(); clearUI();
             gameState.mode = 'word'; gameState.subMode = 'custom';
+            gameState.sourceType = 'custom';
             let title = "📖 基礎練習";
             if (type==='test') title = "📝 拼字練習";
             if (type==='exam') title = "🎓 考試模式";
@@ -2164,8 +2224,125 @@
             void layer.offsetWidth;
             layer.classList.add('show-anim');
             layer.style.display = 'flex';
+            // 換模式按鈕
+            renderSwitchModeArea();
             // 結果畫面撒彩紙
             spawnConfetti();
+        }
+
+        // ════════════════════════════════
+        //  結算：換模式繼續練習同一份
+        // ════════════════════════════════
+        function renderSwitchModeArea() {
+            const area = document.getElementById('switch-mode-area');
+            const btnsEl = document.getElementById('switch-mode-btns');
+            const src = gameState.sourceType;
+
+            if (!src || src === '') { area.style.display = 'none'; return; }
+
+            const modes = [
+                { type: 'practice', label: '📖 基礎練習', bg: 'var(--secondary)', color: '#4A7C6E', shadow: '#95CBB9' },
+                { type: 'test',     label: '📝 拼字練習', bg: 'var(--accent)',    color: '#855b3f', shadow: '#e6c5ae' },
+                { type: 'exam',     label: '🎓 考試模式', bg: '#D2E8F7',          color: '#3B7FB9', shadow: '#B2CDDE' },
+            ];
+
+            btnsEl.innerHTML = '';
+            modes.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.style.cssText = `margin:0; padding:10px 6px; font-size:0.82rem; background:${m.bg}; color:${m.color}; box-shadow:0 4px 0 ${m.shadow};`;
+                btn.innerHTML = m.label;
+                btn.onclick = () => switchAndPlay(m.type);
+                btnsEl.appendChild(btn);
+            });
+            area.style.display = 'block';
+        }
+
+        function switchAndPlay(type) {
+            const src = gameState.sourceType;
+            const repeat = gameState.repeatCount || 1;
+            document.getElementById('result-layer').style.display = 'none';
+            document.getElementById('result-layer').classList.remove('show-anim');
+            if (src === 'custom') {
+                // 重建 currentList
+                const data = gameState.customData[gameState.activeListName];
+                if (!data || data.length === 0) return alert('找不到清單資料！');
+                gameState.testMode = (type === 'test' || type === 'exam');
+                gameState.examMode = (type === 'exam');
+                gameState.repeatCount = repeat;
+                gameState.currentList = [];
+                gameState.tempDictionary = {};
+                gameState.examErrors = [];
+                data.forEach(item => {
+                    const key = item.eng.toLowerCase();
+                    gameState.tempDictionary[key] = item.chi;
+                    for (let i = 0; i < repeat; i++) gameState.currentList.push(key);
+                });
+                if (type === 'exam' || type === 'test') {
+                    for (let i = gameState.currentList.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [gameState.currentList[i], gameState.currentList[j]] = [gameState.currentList[j], gameState.currentList[i]];
+                    }
+                }
+                clearUI();
+                gameState.mode = 'word'; gameState.subMode = 'custom'; gameState.sourceType = 'custom';
+                gameState.pendingTimeLeft = 0;
+                let title = type === 'exam' ? '🎓 考試模式' : type === 'test' ? '📝 拼字練習' : '📖 基礎練習';
+                document.getElementById('pre-title').innerText = title;
+                document.getElementById('pre-desc').innerText = `清單：${gameState.activeListName}，共 ${gameState.currentList.length} 個單字。`;
+                document.getElementById('pre-game-start').style.display = 'block';
+
+            } else if (src === 'review') {
+                const list = getReviewList();
+                if (list.length === 0) return alert('待複習清單是空的！');
+                gameState.testMode = (type === 'test' || type === 'exam');
+                gameState.examMode = (type === 'exam');
+                gameState.repeatCount = repeat;
+                gameState.tempDictionary = {};
+                gameState.currentList = [];
+                gameState.examErrors = [];
+                list.forEach(item => {
+                    const key = item.eng.toLowerCase();
+                    gameState.tempDictionary[key] = item.chi;
+                    for (let i = 0; i < repeat; i++) gameState.currentList.push(key);
+                });
+                if (type === 'exam' || type === 'test') {
+                    for (let i = gameState.currentList.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [gameState.currentList[i], gameState.currentList[j]] = [gameState.currentList[j], gameState.currentList[i]];
+                    }
+                }
+                clearUI();
+                gameState.mode = 'word'; gameState.subMode = 'custom'; gameState.sourceType = 'review';
+                gameState.pendingTimeLeft = 0;
+                let title = type === 'exam' ? '🎓 考試模式' : type === 'test' ? '📝 拼字練習' : '📖 基礎練習';
+                document.getElementById('pre-title').innerText = '📌 待複習清單 — ' + title;
+                document.getElementById('pre-desc').innerText = `共 ${gameState.currentList.length} 題，加油！`;
+                document.getElementById('pre-game-start').style.display = 'block';
+
+            } else if (src === 'sentence') {
+                const pool = gameState.sentencePool;
+                if (!pool || pool.length === 0) return alert('找不到句子資料！');
+                gameState.testMode = (type === 'test' || type === 'exam');
+                gameState.examMode = (type === 'exam');
+                gameState.repeatCount = repeat;
+                gameState.examErrors = [];
+                gameState.currentList = [];
+                for (let i = 0; i < repeat; i++) gameState.currentList.push(...pool);
+                if (type === 'exam' || type === 'test') {
+                    for (let i = gameState.currentList.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [gameState.currentList[i], gameState.currentList[j]] = [gameState.currentList[j], gameState.currentList[i]];
+                    }
+                }
+                clearUI();
+                gameState.mode = 'word'; gameState.subMode = 'sentence'; gameState.sourceType = 'sentence';
+                gameState.pendingTimeLeft = 0;
+                let title = type === 'exam' ? '🎓 句子考試模式' : type === 'test' ? '📝 句子拼字練習' : '📖 句子基礎練習';
+                document.getElementById('pre-title').innerText = title;
+                document.getElementById('pre-desc').innerText = `共 ${gameState.currentList.length} 個句子，準備好了嗎？`;
+                document.getElementById('pre-game-start').style.display = 'block';
+            }
         }
 
         // ════════════════════════════════
@@ -2366,6 +2543,7 @@
             gameState.examMode  = (type === 'exam');
             gameState.examErrors = [];
             gameState.activeListName = '句子練習';
+            gameState.sourceType = 'sentence';
 
             hideModal('sentence-modal');
             closeSidebar(); clearUI();
