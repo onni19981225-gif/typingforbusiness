@@ -1591,12 +1591,12 @@
             gameState.repeatCount = repeat;
             gameState.activeListName = '待複習清單';
             gameState.sourceType = 'review';
-            clearUI();
+            closeSidebar(); clearUI();
             gameState.mode = 'word'; gameState.subMode = 'custom';
             let title = "📖 基礎練習";
             if (type === 'test') title = "📝 拼字練習";
             if (type === 'exam') title = "🎓 考試模式";
-            document.getElementById('pre-title').innerText = '📌 待複習清單 — ' + title;
+            document.getElementById('pre-title').innerHTML = '📌 待複習清單<br><span style="font-size:0.7em;">' + title + '</span>';
             document.getElementById('pre-desc').innerText = `共 ${list.length} 個單字 × ${repeat} 次 = ${gameState.currentList.length} 題，加油！`;
             document.getElementById('pre-game-start').style.display = 'block';
         }
@@ -2355,7 +2355,7 @@
                 gameState.mode = 'word'; gameState.subMode = 'custom'; gameState.sourceType = 'review';
                 gameState.pendingTimeLeft = 0;
                 let title = type === 'exam' ? '🎓 考試模式' : type === 'test' ? '📝 拼字練習' : '📖 基礎練習';
-                document.getElementById('pre-title').innerText = '📌 待複習清單 — ' + title;
+                document.getElementById('pre-title').innerHTML = '📌 待複習清單<br><span style="font-size:0.7em;">' + title + '</span>';
                 document.getElementById('pre-desc').innerText = `共 ${gameState.currentList.length} 題，加油！`;
                 document.getElementById('pre-game-start').style.display = 'block';
 
