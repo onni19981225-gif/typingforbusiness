@@ -1041,15 +1041,15 @@
             <div style="color: var(--text-muted); font-size:0.8rem;">單字挑戰</div>
             <div style="display:flex; gap:8px; width:100%;">
                 <button class="btn-level" onclick="openRandomModal('easy')" title="國小">🏫<span>國小</span></button>
-                <button class="btn-level" onclick="openRandomModal('normal')" title="國中">🏛️<span>國中</span></button>
-                <button class="btn-level" onclick="openRandomModal('hard')" title="高中">🎓<span>高中</span></button>
+                <button class="btn-level btn-locked" onclick="openRandomModal('normal')" title="國中">🏛️<span>國中</span><span class="sidebar-lock" style="font-size:0.65rem; display:none;">🔒</span></button>
+                <button class="btn-level btn-locked" onclick="openRandomModal('hard')" title="高中">🎓<span>高中</span><span class="sidebar-lock" style="font-size:0.65rem; display:none;">🔒</span></button>
             </div>
             <div style="color: var(--text-muted); font-size:0.8rem;">句子練習</div>
-            <button class="btn" style="background: #D6EAF8; color:#1a5276; box-shadow: 0 4px 0 #aed6f1;" onclick="showSentenceModal()">📝 句子模式</button>
+            <button class="btn btn-locked" style="background: #D6EAF8; color:#1a5276; box-shadow: 0 4px 0 #aed6f1;" onclick="showSentenceModal()">📝 句子模式 <span class="sidebar-lock" style="display:none;">🔒</span></button>
             <div style="color: var(--text-muted); font-size:0.8rem;">個人化學習</div>
-            <button class="btn" style="background: #E2F0CB;" onclick="showCustomModal()">✏️ 自訂單字庫</button>
+            <button class="btn btn-locked" style="background: #E2F0CB;" onclick="showCustomModal()">✏️ 自訂單字庫 <span class="sidebar-lock" style="display:none;">🔒</span></button>
             <div class="review-btn-wrap">
-                <button class="btn" style="background: #FFE8E8; color:#c0392b; box-shadow: 0 4px 0 #f5b7b1;" onclick="showReviewModal()">📌 待複習清單</button>
+                <button class="btn btn-locked" style="background: #FFE8E8; color:#c0392b; box-shadow: 0 4px 0 #f5b7b1;" onclick="showReviewModal()">📌 待複習清單 <span class="sidebar-lock" style="display:none;">🔒</span></button>
                 <span id="review-badge">0</span>
             </div>
             <!-- 底部留白，確保最後項目不被截斷 -->
@@ -1533,6 +1533,7 @@
             }
         }
         function showReviewModal() {
+            if (!requireLogin('待複習清單')) return;
             stopGameTimer();
             renderReviewList();
             showModal('review-modal');
@@ -1566,6 +1567,7 @@
             showToast('✅ 已清空待複習清單');
         }
         function startReviewPractice(type) {
+            if (!requireLogin('待複習清單')) return;
             const list = getReviewList();
             if (list.length === 0) return alert('待複習清單是空的！');
             type = type || 'exam';
@@ -1605,6 +1607,7 @@
         //  自訂單字庫
         // ════════════════════════════════
         function showCustomModal() {
+            if (!requireLogin('自訂單字庫')) return;
             stopGameTimer();
             renderSavedLists();
             showModal('custom-modal');
@@ -1614,6 +1617,8 @@
         }
         function openRandomModal(diff) {
             if (!wordsLoaded) { alert('⏳ 單字庫載入中，請稍候再試！'); return; }
+            // 國中、高中需要登入
+            if ((diff === 'normal' || diff === 'hard') && !requireLogin('單字挑戰（國中／高中）')) return;
             stopGameTimer();
             gameState.currentDifficulty = diff;
             const titleMap = { easy: "🏫 國小模式", normal: "🏛️ 國中模式", hard: "🎓 高中模式" };
@@ -1838,6 +1843,8 @@
         }
 
         function launchCustomMode(type) {
+            // 拼字練習和考試模式需要登入
+            if ((type === 'test' || type === 'exam') && !requireLogin('拼字練習／考試模式')) return;
             const repeat = parseInt(document.getElementById('custom-repeat-count').value) || 1;
             const data = gameState.customData[gameState.activeListName];
             if (!data || data.length === 0) return alert('清單是空的！');
@@ -2522,6 +2529,7 @@
         // ════════════════════════════════
 
         function showSentenceModal() {
+            if (!requireLogin('句子模式')) return;
             stopGameTimer();
             showModal('sentence-modal');
             updateSentencePreview();
@@ -2819,10 +2827,29 @@
 
         let currentUser = null;
 
+        // ── 方案判斷 ──
+        // 未登入 = 'free'，登入 = 'lifetime'（Beta 期間全開）
+        function getUserPlan() {
+            return currentUser ? 'lifetime' : 'free';
+        }
+
+        // 需要登入才能使用時呼叫此函式
+        // 若已登入回傳 true；未登入彈出登入視窗並回傳 false
+        function requireLogin(featureName) {
+            if (currentUser) return true;
+            // 開啟側邊欄並彈出帳戶視窗
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('sidebar-overlay').classList.add('show');
+            document.getElementById('account-popup').classList.add('show');
+            showToast('🔒 請先登入以使用「' + featureName + '」功能');
+            return false;
+        }
+
         // 監聽登入狀態變化（頁面載入就自動執行）
         auth.onAuthStateChanged(async (user) => {
             currentUser = user;
             updateAccountChip(user);
+            updateSidebarLocks();
             if (user) {
                 await loadFromCloud(user);
             }
@@ -2842,6 +2869,21 @@
                 closeAccountPopup();
             }
         });
+
+        // ── 更新側邊欄鎖頭狀態 ──
+        function updateSidebarLocks() {
+            const isLoggedIn = !!currentUser;
+            const lockStyle = isLoggedIn ? 'none' : 'inline';
+            // 更新所有帶有 data-lock 屬性的鎖頭 span
+            document.querySelectorAll('.sidebar-lock').forEach(el => {
+                el.style.display = lockStyle;
+            });
+            // 登入後移除按鈕的灰階樣式
+            document.querySelectorAll('.btn-locked').forEach(el => {
+                el.style.opacity = isLoggedIn ? '1' : '0.55';
+                el.style.filter = isLoggedIn ? 'none' : 'grayscale(40%)';
+            });
+        }
 
         function updateAccountChip(user) {
             const avatar = document.getElementById('acct-avatar');
