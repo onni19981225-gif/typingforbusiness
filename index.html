@@ -1215,12 +1215,11 @@
                         <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color:#999;">❌</button>
                     </div>
                 </div>
-                <button class="btn" style="background: #E2F0CB; font-size: 0.9rem; padding: 8px 14px;" onclick="addNewWordRow()">➕ 新增一列</button>
                 <div id="edit-mode-banner" style="display:none; background:#FFF3CD; border:2px solid #FFC107; border-radius:10px; padding:8px 14px; margin-bottom:8px; font-size:0.95rem; color:#856404; font-weight:bold;">
                     ✏️ 正在編輯：<span id="edit-mode-name"></span>
                     <button onclick="cancelEdit()" style="float:right;border:none;background:none;cursor:pointer;color:#856404;font-size:1rem;">✖ 取消</button>
                 </div>
-                <button class="btn" style="margin-top: 5px;" onclick="saveCustomList()" id="save-list-btn">💾 儲存這份單字清單</button>
+                <button class="btn" style="padding: 8px 14px; font-size: 0.9rem;" onclick="saveCustomList()" id="save-list-btn">💾 儲存這份單字清單</button>
             </div>
             <hr style="margin: 15px 0; border: 0.5px solid var(--card-border);">
             <h4 style="color: var(--text-muted); margin: 0 0 10px 0;">我的收藏清單</h4>
@@ -1771,29 +1770,34 @@
         }
 
         function attachRowAutoAdd(row) {
-            if (row._autoAddBound) return; // 防止重複綁定
+            if (row._autoAddBound) return;
             row._autoAddBound = true;
             const engIn = row.querySelector('.eng-in');
             const chiIn = row.querySelector('.chi-in');
-            let justTriggered = false; // 防止 keydown 與隨後的 blur 雙重觸發
-            function maybeAddRow(e) {
-                const isTabOrEnter = e.type === 'keydown' && (e.key === 'Tab' || e.key === 'Enter');
-                const isBlur = e.type === 'blur';
-                if (!isTabOrEnter && !isBlur) return;
-                if (isBlur && justTriggered) { justTriggered = false; return; }
+            // 英文欄填完按 Tab/Enter → 若是最後一列則新增下一列，否則跳到中文欄
+            engIn.addEventListener('keydown', function(e) {
+                if (e.key !== 'Tab' && e.key !== 'Enter') return;
+                if (!engIn.value.trim()) return;
+                e.preventDefault();
                 const container = document.getElementById('custom-rows-container');
                 const rows = container.querySelectorAll('.word-row');
                 const isLast = rows[rows.length - 1] === row;
-                if (!isLast) return;
-                if (!engIn.value.trim() || !chiIn.value.trim()) return;
-                if (isTabOrEnter) { e.preventDefault(); justTriggered = true; }
-                addNewWordRow();
-            }
-            chiIn.addEventListener('keydown', maybeAddRow);
-            chiIn.addEventListener('blur', maybeAddRow);
-            // 英文欄按 Enter 跳到同列中文欄
-            engIn.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') { e.preventDefault(); chiIn.focus(); }
+                if (isLast) {
+                    addNewWordRow(); // focus 自動移到新列英文欄
+                } else {
+                    chiIn.focus();
+                }
+            });
+            // 中文欄按 Tab/Enter → 跳到下一列英文欄
+            chiIn.addEventListener('keydown', function(e) {
+                if (e.key !== 'Tab' && e.key !== 'Enter') return;
+                e.preventDefault();
+                const container = document.getElementById('custom-rows-container');
+                const rows = Array.from(container.querySelectorAll('.word-row'));
+                const idx = rows.indexOf(row);
+                if (idx < rows.length - 1) {
+                    rows[idx + 1].querySelector('.eng-in').focus();
+                }
             });
         }
 
