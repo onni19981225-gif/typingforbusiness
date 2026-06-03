@@ -513,8 +513,8 @@
         }
         /* 單字輸入列容器：固定高度，內部滾動 */
         #custom-rows-container {
-            max-height: 35vh !important;
-            overflow-y: auto !important;
+            overflow-y: visible;
+            scrollbar-gutter: stable;
         }
         #custom-modal #saved-lists-display {
             flex: 1;
@@ -562,23 +562,34 @@
 
         .list-item {
             background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-left: 3px solid var(--secondary);
-            padding: 7px 10px;
-            border-radius: 8px;
+            border: 2px solid var(--card-border);
+            border-left: 5px solid var(--primary);
+            border-bottom: 4px solid var(--card-border);
+            box-shadow: 0 3px 0 rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.06);
+            padding: 10px 12px;
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 6px;
             font-weight: bold;
-            font-size: 0.88rem;
-            transition: border-color 0.15s, background 0.15s;
+            font-size: 0.9rem;
+            transition: transform 0.1s, box-shadow 0.1s, border-color 0.15s;
             color: var(--text-main);
             touch-action: manipulation;
             min-width: 0;
         }
-        .list-item:hover { border-left-color: var(--primary); background: var(--bg); }
+        .list-item:hover {
+            border-left-color: var(--primary);
+            box-shadow: 0 5px 0 rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
+        }
+        .list-item:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.08);
+            border-bottom-width: 2px;
+        }
         .list-item-label {
             flex: 1;
             min-width: 0;
@@ -991,9 +1002,9 @@
             border-radius: 6px !important;
         }
 
-        /* 清單項目 */
+        /* 清單項目 — 圓角與主樣式一致 */
         .list-item {
-            border-radius: 6px !important;
+            border-radius: 10px !important;
         }
 
         /* 複習清單項目 */
