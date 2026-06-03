@@ -1207,22 +1207,27 @@
             <button onclick="hideModal('custom-modal')" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--text-muted); line-height:1; padding:4px 8px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--card-border)'" onmouseout="this.style.background='none'">✕</button>
             <h3 style="color: var(--primary); font-size: 1.8rem; margin-top: 0;">✏️ 自訂單字庫管理</h3>
             <div id="list-creation-area">
-                <input type="text" id="new-list-name" placeholder="清單名稱 (如：第五課單字)" inputmode="none" style="width:90%; padding:10px; margin-bottom:12px; border-radius:10px; border:2px solid var(--primary); font-size: 1rem; font-family: inherit; background: var(--input-bg); color: var(--text-main);">
+                <div style="display:flex; gap:8px; margin-bottom:12px; align-items:stretch;">
+                    <input type="text" id="new-list-name" placeholder="清單名稱 (如：第五課單字)" inputmode="none" style="flex:1; padding:10px; border-radius:10px; border:2px solid var(--primary); font-size: 1rem; font-family: inherit; background: var(--input-bg); color: var(--text-main);">
+                    <button class="btn" style="width:auto; padding:10px 16px; font-size:0.9rem; margin-bottom:0; white-space:nowrap;" onclick="saveCustomList()" id="save-list-btn">💾 儲存</button>
+                </div>
                 <div id="custom-rows-container" style="overflow-x: hidden; -webkit-overflow-scrolling: touch; margin-bottom:12px; border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; background: var(--bg);">
                     <div class="word-row">
                         <input type="text" class="eng-in" placeholder="英文" inputmode="none">
                         <input type="text" class="chi-in" placeholder="中文" inputmode="none">
-                        <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color:#999;">❌</button>
+                        <button onclick="safeRemoveRow(this)" style="border:none; background:none; cursor:pointer; color:#999;">❌</button>
                     </div>
                 </div>
                 <div id="edit-mode-banner" style="display:none; background:#FFF3CD; border:2px solid #FFC107; border-radius:10px; padding:8px 14px; margin-bottom:8px; font-size:0.95rem; color:#856404; font-weight:bold;">
                     ✏️ 正在編輯：<span id="edit-mode-name"></span>
                     <button onclick="cancelEdit()" style="float:right;border:none;background:none;cursor:pointer;color:#856404;font-size:1rem;">✖ 取消</button>
                 </div>
-                <button class="btn" style="padding: 8px 14px; font-size: 0.9rem;" onclick="saveCustomList()" id="save-list-btn">💾 儲存這份單字清單</button>
             </div>
-            <hr style="margin: 15px 0; border: 0.5px solid var(--card-border);">
-            <h4 style="color: var(--text-muted); margin: 0 0 10px 0;">我的收藏清單</h4>
+            <div style="display:flex; align-items:center; gap:10px; margin: 14px 0 10px 0;">
+                <div style="flex:1; height:2px; background: linear-gradient(to right, var(--primary), transparent); border-radius:1px; opacity:0.35;"></div>
+                <span style="font-size:0.8rem; font-weight:bold; color:var(--text-muted); white-space:nowrap; letter-spacing:0.05em;">我的收藏清單</span>
+                <div style="flex:1; height:2px; background: linear-gradient(to left, var(--primary), transparent); border-radius:1px; opacity:0.35;"></div>
+            </div>
             <div id="saved-lists-display" style="text-align: left; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 120px;"></div>
 
         </div>
@@ -1769,6 +1774,13 @@
             if (targetEl) targetEl.classList.add('highlight');
         }
 
+        function safeRemoveRow(btn) {
+            const container = document.getElementById('custom-rows-container');
+            const rows = container.querySelectorAll('.word-row');
+            if (rows.length <= 1) return; // 最後一列不能刪
+            btn.parentElement.remove();
+        }
+
         function attachRowAutoAdd(row) {
             if (row._autoAddBound) return;
             row._autoAddBound = true;
@@ -1783,7 +1795,7 @@
                 const rows = container.querySelectorAll('.word-row');
                 const isLast = rows[rows.length - 1] === row;
                 if (isLast) {
-                    addNewWordRow(); // focus 自動移到新列英文欄
+                    addNewWordRow();
                 } else {
                     chiIn.focus();
                 }
@@ -1804,7 +1816,7 @@
         function addNewWordRow() {
             const container = document.getElementById('custom-rows-container');
             const row = document.createElement('div'); row.className = 'word-row';
-            row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" inputmode="none"><input type="text" class="chi-in" placeholder="中文" inputmode="none"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
+            row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" inputmode="none"><input type="text" class="chi-in" placeholder="中文" inputmode="none"><button onclick="safeRemoveRow(this)" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
             attachRowAutoAdd(row);
             container.appendChild(row);
             // 自動滾到底部並 focus 新列英文欄
@@ -1844,7 +1856,7 @@
         function _resetEditForm() {
             gameState.editingListName = "";
             document.getElementById('new-list-name').value = "";
-            document.getElementById('custom-rows-container').innerHTML = `<div class="word-row"><input type="text" class="eng-in" placeholder="英文" inputmode="none"><input type="text" class="chi-in" placeholder="中文" inputmode="none"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button></div>`;
+            document.getElementById('custom-rows-container').innerHTML = `<div class="word-row"><input type="text" class="eng-in" placeholder="英文" inputmode="none"><input type="text" class="chi-in" placeholder="中文" inputmode="none"><button onclick="safeRemoveRow(this)" style="border:none;background:none;cursor:pointer;color:#999;">❌</button></div>`;
             // 對重設後的初始列綁定自動新增事件
             const container = document.getElementById('custom-rows-container');
             attachRowAutoAdd(container.querySelector('.word-row'));
@@ -1915,7 +1927,7 @@
             container.innerHTML = '';
             data.forEach(item => {
                 const row = document.createElement('div'); row.className = 'word-row';
-                row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" inputmode="none" value="${item.eng.replace(/"/g,'&quot;')}"><input type="text" class="chi-in" placeholder="中文" inputmode="none" value="${item.chi.replace(/"/g,'&quot;')}"><button onclick="this.parentElement.remove()" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
+                row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" inputmode="none" value="${item.eng.replace(/"/g,'&quot;')}"><input type="text" class="chi-in" placeholder="中文" inputmode="none" value="${item.chi.replace(/"/g,'&quot;')}"><button onclick="safeRemoveRow(this)" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
                 attachRowAutoAdd(row);
                 container.appendChild(row);
             });
