@@ -215,9 +215,10 @@
             display: inline-flex; align-items: center; gap: 4px;
             padding: 3px 10px; border-radius: 99px;
             font-size: 11px; font-weight: bold;
-            background: #FAEEDA; color: #854F0B;
+            background: #e8e8e8; color: #666;
+            transition: background 0.2s, color 0.2s;
         }
-        body.dark .plan-badge { background: #3a2e1a; color: #EF9F27; }
+        body.dark .plan-badge { background: #2a2a2a; color: #aaa; }
 
         .popup-section {
             padding: 5px 8px;
@@ -1084,10 +1085,10 @@
                             <div class="popup-email" id="popup-email">載入中...</div>
                         </div>
                     </div>
-                    <span class="plan-badge">⭐ 免費版</span>
+                    <span class="plan-badge" id="plan-badge-display">🆓 免費版</span>
                 </div>
                 <div class="popup-section">
-                    <button class="popup-item upgrade" onclick="alert('升級功能即將推出！')">
+                    <button id="upgrade-pro-btn" class="popup-item upgrade" onclick="showToast('💎 請聯絡老師或前往官網升級 Pro！')">
                         <span class="pi-icon">🚀</span>
                         <span>升級 Pro 會員<span class="pi-sub">雲端同步・無限單字庫・進階統計</span></span>
                     </button>
@@ -1434,6 +1435,7 @@
             document.body.classList.toggle('dark', darkMode);
             document.getElementById('dark-mode-toggle').textContent = darkMode ? '☀️' : '🌙';
             localStorage.setItem('dark_mode', darkMode);
+            updatePlanBadge();
         }
 
         // ════════════════
@@ -1638,7 +1640,7 @@
             }
         }
         function showReviewModal() {
-            if (!requireLogin('待複習清單')) return;
+            if (!requirePro('待複習清單')) return;
             stopGameTimer();
             renderReviewList();
             showModal('review-modal');
@@ -1672,7 +1674,7 @@
             showToast('✅ 已清空待複習清單');
         }
         function startReviewPractice(type) {
-            if (!requireLogin('待複習清單')) return;
+            if (!requirePro('待複習清單')) return;
             const list = getReviewList();
             if (list.length === 0) return alert('待複習清單是空的！');
             type = type || 'exam';
@@ -1712,7 +1714,7 @@
         //  自訂單字庫
         // ════════════════════════════════
         function showCustomModal() {
-            if (!requireLogin('自訂單字庫')) return;
+            if (!requirePro('自訂單字庫')) return;
             stopGameTimer();
             renderSavedLists();
             showModal('custom-modal');
@@ -1722,8 +1724,8 @@
         }
         function openRandomModal(diff) {
             if (!wordsLoaded) { alert('⏳ 單字庫載入中，請稍候再試！'); return; }
-            // 國中、高中需要登入
-            if ((diff === 'normal' || diff === 'hard') && !requireLogin('單字挑戰（國中／高中）')) return;
+            // 國中、高中需要 Pro
+            if ((diff === 'normal' || diff === 'hard') && !requirePro('單字挑戰（國中／高中）')) return;
             stopGameTimer();
             gameState.currentDifficulty = diff;
             const titleMap = { easy: "🏫 國小模式", normal: "🏛️ 國中模式", hard: "🎓 高中模式" };
@@ -1973,8 +1975,8 @@
         }
 
         function launchCustomMode(type) {
-            // 拼字練習和考試模式需要登入
-            if ((type === 'test' || type === 'exam') && !requireLogin('拼字練習／考試模式')) return;
+            // 拼字練習和考試模式需要 Pro
+            if ((type === 'test' || type === 'exam') && !requirePro('拼字練習／考試模式')) return;
             const repeat = parseInt(document.getElementById('custom-repeat-count').value) || 1;
             const data = gameState.customData[gameState.activeListName];
             if (!data || data.length === 0) return alert('清單是空的！');
@@ -2659,7 +2661,7 @@
         // ════════════════════════════════
 
         function showSentenceModal() {
-            if (!requireLogin('句子模式')) return;
+            if (!requirePro('句子模式')) return;
             stopGameTimer();
             showModal('sentence-modal');
             updateSentencePreview();
@@ -2956,18 +2958,79 @@
         // ════════════════════════════════
 
         let currentUser = null;
+        let currentUserDoc = null;
 
-        // ── 方案判斷 ──
-        // 未登入 = 'free'，登入 = 'lifetime'（Beta 期間全開）
-        function getUserPlan() {
-            return currentUser ? 'lifetime' : 'free';
+        // ── 從 Firestore 讀取 user doc，新用戶自動建立預設 doc ──
+        async function loadUserDoc(user) {
+            try {
+                const ref = db.collection('users').doc(user.uid);
+                const snap = await ref.get();
+                if (snap.exists) {
+                    currentUserDoc = snap.data();
+                } else {
+                    // 新用戶：建立預設 doc
+                    const defaultDoc = {
+                        plan: 'free',
+                        classId: null,
+                        role: null,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    await ref.set(defaultDoc, { merge: true });
+                    currentUserDoc = defaultDoc;
+                }
+            } catch (err) {
+                console.warn('loadUserDoc 失敗:', err);
+                currentUserDoc = null;
+            }
         }
 
-        // 需要登入才能使用時呼叫此函式
-        // 若已登入回傳 true；未登入彈出登入視窗並回傳 false
+        // ── 方案判斷：從 currentUserDoc 讀取 ──
+        function getUserPlan() {
+            if (!currentUser) return 'free';
+            if (!currentUserDoc) return 'free';
+            return currentUserDoc.plan || 'free';
+        }
+
+        // ── 是否有 Pro / Lifetime / Class 老師權限 ──
+        function hasPro() {
+            const plan = getUserPlan();
+            return plan === 'pro' || plan === 'lifetime' || (plan === 'class' && isTeacher());
+        }
+
+        // ── 是否有教室區權限（綁定學生 or 老師）──
+        function hasClassAccess() {
+            if (!currentUserDoc) return false;
+            return !!currentUserDoc.classId;
+        }
+
+        // ── 是否是老師 ──
+        function isTeacher() {
+            if (!currentUserDoc) return false;
+            return currentUserDoc.role === 'teacher';
+        }
+
+        // ── Pro 功能守衛：未登入導向登入，已登入但非 Pro 顯示升級提示 ──
+        function requirePro(featureName) {
+            if (!currentUser) {
+                document.getElementById('sidebar').classList.add('open');
+                document.getElementById('sidebar-overlay').classList.add('show');
+                document.getElementById('account-popup').classList.add('show');
+                showToast('🔒 請先登入以使用「' + featureName + '」功能');
+                return false;
+            }
+            if (!hasPro()) {
+                document.getElementById('sidebar').classList.add('open');
+                document.getElementById('sidebar-overlay').classList.add('show');
+                document.getElementById('account-popup').classList.add('show');
+                showToast('⭐ 請升級 Pro 以使用「' + featureName + '」功能');
+                return false;
+            }
+            return true;
+        }
+
+        // ── 需要登入才能使用時呼叫此函式 ──
         function requireLogin(featureName) {
             if (currentUser) return true;
-            // 開啟側邊欄並彈出帳戶視窗
             document.getElementById('sidebar').classList.add('open');
             document.getElementById('sidebar-overlay').classList.add('show');
             document.getElementById('account-popup').classList.add('show');
@@ -2975,14 +3038,35 @@
             return false;
         }
 
+        // ── 依 plan 更新帳戶彈窗的徽章文字與顏色 ──
+        function updatePlanBadge() {
+            const badge = document.getElementById('plan-badge-display');
+            if (!badge) return;
+            const plan = getUserPlan();
+            const isDark = document.body.classList.contains('dark');
+            const configs = {
+                free:     { text: '🆓 免費版',   bg: '#e8e8e8', color: '#666',    darkBg: '#2a2a2a', darkColor: '#aaa' },
+                pro:      { text: '💎 Pro 會員', bg: '#DBEAFE', color: '#1E40AF', darkBg: '#1e2d4a', darkColor: '#60A5FA' },
+                lifetime: { text: '🏆 Lifetime', bg: '#FEF3C7', color: '#92400E', darkBg: '#3a2e1a', darkColor: '#EF9F27' },
+                class:    { text: '🎓 Class',    bg: '#EDE9FE', color: '#5B21B6', darkBg: '#2d1f4a', darkColor: '#A78BFA' },
+            };
+            const cfg = configs[plan] || configs.free;
+            badge.textContent = cfg.text;
+            badge.style.background = isDark ? cfg.darkBg : cfg.bg;
+            badge.style.color = isDark ? cfg.darkColor : cfg.color;
+        }
+
         // 監聽登入狀態變化（頁面載入就自動執行）
         auth.onAuthStateChanged(async (user) => {
             currentUser = user;
-            updateAccountChip(user);
-            updateSidebarLocks();
+            currentUserDoc = null;
             if (user) {
+                await loadUserDoc(user);
                 await loadFromCloud(user);
             }
+            updateAccountChip(user);
+            updateSidebarLocks();
+            updatePlanBadge();
         });
 
         function toggleAccountPopup() {
@@ -3002,16 +3086,24 @@
 
         // ── 更新側邊欄鎖頭狀態 ──
         function updateSidebarLocks() {
-            const isLoggedIn = !!currentUser;
-            const lockStyle = isLoggedIn ? 'none' : 'inline';
-            // 更新所有帶有 data-lock 屬性的鎖頭 span
+            const proOk = hasPro();
+            // Pro 功能鎖頭（.sidebar-lock）
             document.querySelectorAll('.sidebar-lock').forEach(el => {
-                el.style.display = lockStyle;
+                el.style.display = proOk ? 'none' : 'inline';
             });
-            // 登入後移除按鈕的灰階樣式
+            // Pro 功能按鈕的灰階樣式（.btn-locked）
             document.querySelectorAll('.btn-locked').forEach(el => {
-                el.style.opacity = isLoggedIn ? '1' : '0.55';
-                el.style.filter = isLoggedIn ? 'none' : 'grayscale(40%)';
+                el.style.opacity = proOk ? '1' : '0.55';
+                el.style.filter = proOk ? 'none' : 'grayscale(40%)';
+            });
+            // 登入才解鎖的功能（.login-lock / .btn-login-locked）
+            const loggedIn = !!currentUser;
+            document.querySelectorAll('.login-lock').forEach(el => {
+                el.style.display = loggedIn ? 'none' : 'inline';
+            });
+            document.querySelectorAll('.btn-login-locked').forEach(el => {
+                el.style.opacity = loggedIn ? '1' : '0.55';
+                el.style.filter = loggedIn ? 'none' : 'grayscale(40%)';
             });
         }
 
@@ -3029,6 +3121,9 @@
                 document.getElementById('popup-email').textContent = user.email || '';
                 document.getElementById('popup-logged').style.display = 'flex';
                 document.getElementById('popup-guest').style.display = 'none';
+                // 顯示/隱藏升級按鈕
+                const upgradeBtn = document.getElementById('upgrade-pro-btn');
+                if (upgradeBtn) upgradeBtn.style.display = hasPro() ? 'none' : '';
             } else {
                 avatar.textContent = '👤';
                 avatar.classList.add('guest');
@@ -3036,6 +3131,7 @@
                 document.getElementById('popup-logged').style.display = 'none';
                 document.getElementById('popup-guest').style.display = 'flex';
             }
+            updatePlanBadge();
         }
 
         // ── Google 登入 ──
