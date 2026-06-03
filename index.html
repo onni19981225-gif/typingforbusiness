@@ -1033,6 +1033,194 @@
         #review-modal button[onclick="clearAllReview()"] {
             border-radius: 8px !important;
         }
+
+        /* ══════════════════════════════════════
+           CLASS 系統 CSS
+        ══════════════════════════════════════ */
+
+        /* 加入班級 — 帳戶彈窗裡的輸入區 */
+        .join-class-wrap {
+            padding: 10px 10px 6px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .join-class-wrap label {
+            font-size: 11px; color: var(--text-muted); font-weight: bold;
+            display: block; margin-bottom: 5px;
+        }
+        .join-class-row {
+            display: flex; gap: 6px; align-items: center;
+        }
+        .join-class-input {
+            flex: 1; padding: 8px 10px; border-radius: 10px;
+            border: 1.5px solid var(--card-border);
+            font-size: 13px; font-family: inherit;
+            background: var(--input-bg); color: var(--text-main);
+            letter-spacing: 2px; text-transform: uppercase;
+            outline: none;
+        }
+        .join-class-input:focus { border-color: var(--primary); }
+        .join-class-btn {
+            padding: 8px 12px; border-radius: 10px;
+            background: var(--primary); color: #fff;
+            border: none; font-size: 12px; font-weight: bold;
+            cursor: pointer; font-family: inherit;
+            transition: background 0.15s; white-space: nowrap;
+        }
+        .join-class-btn:hover { background: #2e6494; }
+        .join-class-info {
+            font-size: 10px; color: var(--text-muted);
+            margin-top: 4px; display: none;
+        }
+        .join-class-info.show { display: block; }
+
+        /* 教室區 modal */
+        #classroom-modal { align-items: flex-start; padding: 6px; }
+        #classroom-modal .modal-content {
+            max-width: 820px; width: 100%;
+            height: calc(100vh - 12px);
+            padding: 16px 20px; margin: auto;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            border: 2px solid #C3B1E1;
+            border-radius: 14px !important; position: relative;
+        }
+
+        /* 老師儀表板 modal */
+        #teacher-dashboard-modal { align-items: flex-start; padding: 6px; }
+        #teacher-dashboard-modal .modal-content {
+            max-width: 900px; width: 100%;
+            height: calc(100vh - 12px);
+            padding: 16px 20px; margin: auto;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            border: 2px solid #A9CCE3;
+            border-radius: 14px !important; position: relative;
+        }
+
+        /* 共用 tab 切換列 */
+        .class-tab-bar {
+            display: flex; gap: 6px; margin-bottom: 12px; flex-shrink: 0;
+        }
+        .class-tab-btn {
+            flex: 1; padding: 9px 6px; border-radius: 10px;
+            border: 2px solid var(--card-border);
+            background: var(--card-bg); color: var(--text-muted);
+            font-size: 0.85rem; font-weight: bold; cursor: pointer;
+            font-family: inherit; transition: 0.15s;
+        }
+        .class-tab-btn.active {
+            background: var(--primary); color: #fff; border-color: var(--primary);
+        }
+
+        /* 指派清單卡片（學生端） */
+        .assignment-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-left: 5px solid #9B59B6;
+            border-bottom: 4px solid var(--card-border);
+            box-shadow: 0 3px 0 rgba(0,0,0,0.08);
+            padding: 12px 14px; border-radius: 10px;
+            cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center;
+            gap: 8px; font-weight: bold; font-size: 0.95rem;
+            transition: transform 0.1s, box-shadow 0.1s;
+            color: var(--text-main); touch-action: manipulation;
+        }
+        .assignment-card:hover {
+            box-shadow: 0 5px 0 rgba(0,0,0,0.10);
+            transform: translateY(-1px);
+        }
+        .assignment-card:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.08);
+        }
+        .assignment-meta {
+            font-size: 0.78rem; color: var(--text-muted);
+            font-weight: normal; margin-top: 2px;
+        }
+
+        /* 老師端 — 成員列表 */
+        .member-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 9px 10px; border-radius: 10px; margin-bottom: 6px;
+            background: var(--bg); border: 1px solid var(--card-border);
+            font-size: 0.9rem; color: var(--text-main);
+        }
+        .member-name { font-weight: bold; }
+        .member-sub  { font-size: 0.78rem; color: var(--text-muted); }
+        .member-kick-btn {
+            background: none; border: 1.5px solid #e74c3c;
+            color: #e74c3c; border-radius: 8px;
+            padding: 4px 10px; font-size: 0.78rem; cursor: pointer;
+            font-family: inherit; transition: 0.15s;
+        }
+        .member-kick-btn:hover { background: #e74c3c; color: #fff; }
+
+        /* 老師端 — 指派清單選擇 */
+        .assign-list-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 12px; border-radius: 10px; margin-bottom: 6px;
+            background: var(--bg); border: 1.5px solid var(--card-border);
+            font-size: 0.9rem; color: var(--text-main); gap: 8px;
+        }
+        .assign-list-item.assigned {
+            border-color: #9B59B6; background: #f5f0ff;
+        }
+        body.dark .assign-list-item.assigned { background: #2a1f3d; }
+        .assign-toggle-btn {
+            padding: 5px 12px; border-radius: 8px;
+            font-size: 0.8rem; font-weight: bold; cursor: pointer;
+            font-family: inherit; border: none; transition: 0.15s; white-space: nowrap;
+        }
+        .assign-toggle-btn.add    { background: #9B59B6; color: #fff; }
+        .assign-toggle-btn.add:hover { background: #7D3C98; }
+        .assign-toggle-btn.remove { background: var(--card-border); color: var(--text-muted); }
+        .assign-toggle-btn.remove:hover { background: #e74c3c; color: #fff; }
+
+        /* 邀請碼顯示區 */
+        .invite-code-box {
+            background: var(--bg); border: 2px dashed #9B59B6;
+            border-radius: 14px; padding: 14px 18px; text-align: center;
+            margin-bottom: 12px; flex-shrink: 0;
+        }
+        .invite-code-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; }
+        .invite-code-num {
+            font-size: 2rem; font-weight: bold; letter-spacing: 6px;
+            color: #9B59B6; font-family: monospace;
+        }
+        .invite-code-actions { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+        .invite-code-btn {
+            padding: 6px 14px; border-radius: 8px; border: none;
+            font-size: 0.8rem; font-weight: bold; cursor: pointer;
+            font-family: inherit; transition: 0.15s;
+        }
+        .invite-code-btn.copy   { background: #9B59B6; color: #fff; }
+        .invite-code-btn.copy:hover { background: #7D3C98; }
+        .invite-code-btn.reset  { background: var(--card-border); color: var(--text-muted); }
+        .invite-code-btn.reset:hover { background: #e74c3c; color: #fff; }
+
+        /* 教室區編輯單字庫（inline 在 teacher dashboard 裡） */
+        #assignment-edit-panel {
+            display: none;
+            flex-direction: column;
+            flex: 1; min-height: 0;
+        }
+        #assignment-edit-panel.show { display: flex; }
+        .edit-panel-back {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 10px; cursor: pointer;
+            font-size: 0.9rem; color: var(--primary); font-weight: bold;
+        }
+        .edit-panel-back:hover { text-decoration: underline; }
+
+        /* 班級資訊區 */
+        .class-info-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 99px;
+            font-size: 11px; font-weight: bold;
+            background: #EDE9FE; color: #5B21B6;
+        }
+        body.dark .class-info-chip { background: #2d1f4a; color: #A78BFA; }
     </style>
 </head>
 <body>
@@ -1103,7 +1291,29 @@
                     <button class="popup-item" onclick="alert('學習統計功能即將推出！')">
                         <span class="pi-icon">📊</span><span>學習統計</span>
                     </button>
-
+                    <!-- 加入班級（非老師、非已綁定時顯示） -->
+                    <div id="join-class-popup-wrap" style="display:none;">
+                        <div class="join-class-wrap">
+                            <label>🏫 加入班級（輸入邀請碼）</label>
+                            <div class="join-class-row">
+                                <input type="text" id="join-code-input" class="join-class-input" maxlength="6" placeholder="ABC123">
+                                <button class="join-class-btn" onclick="joinClassByCode()">加入</button>
+                            </div>
+                            <div class="join-class-info" id="join-class-info"></div>
+                        </div>
+                    </div>
+                    <!-- 已加入班級（學生顯示班級名稱＋離開） -->
+                    <div id="class-member-info-wrap" style="display:none; padding:8px 10px;">
+                        <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">📚 目前班級</div>
+                        <div style="display:flex; align-items:center; justify-content:space-between;">
+                            <span class="class-info-chip" id="class-name-chip">班級名稱</span>
+                            <button class="popup-item danger" style="width:auto; padding:4px 10px; font-size:11px;" onclick="confirmLeaveClass()">離開</button>
+                        </div>
+                    </div>
+                    <!-- 老師：打開儀表板 -->
+                    <button id="teacher-dashboard-btn" class="popup-item" style="display:none;" onclick="showTeacherDashboard()">
+                        <span class="pi-icon">🎓</span><span>老師儀表板<span class="pi-sub">管理班級・指派清單</span></span>
+                    </button>
                 </div>
                 <div class="popup-section">
                     <button class="popup-item danger" onclick="signOut()">
@@ -1147,6 +1357,11 @@
             <div class="review-btn-wrap">
                 <button class="btn btn-locked" style="background: #FFE8E8; color:#c0392b; box-shadow: 0 4px 0 #f5b7b1;" onclick="showReviewModal()">📌 待複習清單 <span class="sidebar-lock" style="display:none;">🔒</span></button>
                 <span id="review-badge">0</span>
+            </div>
+            <!-- 教室區（有 classId 才顯示） -->
+            <div id="classroom-section" style="display:none;">
+                <div style="color: var(--text-muted); font-size:0.8rem;">教室區</div>
+                <button class="btn" style="background: #EDE9FE; color:#5B21B6; box-shadow: 0 4px 0 #C3B1E1;" onclick="showClassroomModal()">🏫 教室區</button>
             </div>
             <!-- 底部留白，確保最後項目不被截斷 -->
             <div style="height: 20px; flex-shrink: 0;"></div>
@@ -1358,6 +1573,93 @@
             <div id="rename-error" style="color:#e74c3c; font-size:0.9rem; min-height:1.2rem; margin-bottom:6px;"></div>
             <button class="btn" onclick="submitRename()" style="font-size:1.1rem;">確認修改</button>
             <button class="btn" style="background:#eee; color:#888; box-shadow:0 4px 0 #ccc; margin-top:8px;" onclick="hideModal('rename-modal')">取消</button>
+        </div>
+    </div>
+
+    <!-- ══ 教室區 Modal（學生端）══ -->
+    <div id="classroom-modal" class="modal">
+        <div class="modal-content">
+            <button onclick="hideModal('classroom-modal')" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text-muted);line-height:1;padding:4px 8px;border-radius:8px;transition:background 0.2s;" onmouseover="this.style.background='var(--card-border)'" onmouseout="this.style.background='none'">✕</button>
+            <h3 style="color:#5B21B6;font-size:1.8rem;margin-top:0;flex-shrink:0;">🏫 教室區</h3>
+            <p id="classroom-class-name" style="color:var(--text-muted);font-size:0.9rem;margin:0 0 12px 0;flex-shrink:0;"></p>
+
+            <!-- 模式選擇 modal（選單字清單後顯示）-->
+            <div id="classroom-mode-select" style="display:none;flex-direction:column;flex:1;min-height:0;">
+                <div class="edit-panel-back" onclick="closeClassroomModeSelect()">← 返回清單</div>
+                <div id="classroom-mode-title" style="font-size:1.1rem;font-weight:bold;color:var(--text-main);margin-bottom:12px;flex-shrink:0;"></div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex-shrink:0;">
+                    <button class="btn" style="margin:0;padding:12px 6px;font-size:0.85rem;" onclick="launchClassroomMode('practice')">📖<br>基礎練習<br><span style="font-size:0.7rem;font-weight:normal;">看著打</span></button>
+                    <button class="btn" style="margin:0;padding:12px 6px;font-size:0.85rem;background:var(--accent);color:#855b3f;box-shadow:0 4px 0 #e6c5ae;" onclick="launchClassroomMode('test')">📝<br>拼字練習<br><span style="font-size:0.7rem;font-weight:normal;">遮住打</span></button>
+                    <button class="btn" style="margin:0;padding:12px 6px;font-size:0.85rem;background:#D2E8F7;color:#3B7FB9;box-shadow:0 4px 0 #B2CDDE;" onclick="launchClassroomMode('exam')">🎓<br>考試模式<br><span style="font-size:0.7rem;font-weight:normal;">直接打</span></button>
+                </div>
+                <div style="margin-top:8px;flex-shrink:0;">
+                    <label style="font-size:0.9rem;color:var(--text-muted);font-weight:bold;">每題幾次：</label>
+                    <input type="number" id="classroom-repeat-count" value="1" min="1" max="10" style="width:60px;text-align:center;font-size:1rem;">
+                </div>
+            </div>
+
+            <!-- 清單列表 -->
+            <div id="classroom-list-view" style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:8px;padding-top:2px;">
+                <div id="classroom-assignments-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ 老師儀表板 Modal ══ -->
+    <div id="teacher-dashboard-modal" class="modal">
+        <div class="modal-content">
+            <button onclick="hideModal('teacher-dashboard-modal')" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text-muted);line-height:1;padding:4px 8px;border-radius:8px;transition:background 0.2s;" onmouseover="this.style.background='var(--card-border)'" onmouseout="this.style.background='none'">✕</button>
+            <h3 style="color:#1a5276;font-size:1.8rem;margin-top:0;flex-shrink:0;">🎓 老師儀表板</h3>
+
+            <!-- 無班級時：建立班級 -->
+            <div id="teacher-no-class" style="display:none;flex-direction:column;align-items:center;gap:12px;padding:20px 0;">
+                <div style="font-size:1rem;color:var(--text-muted);">你還沒有建立班級</div>
+                <input type="text" id="new-class-name-input" placeholder="輸入班級名稱（例：五年三班）" style="width:100%;padding:12px;border-radius:12px;border:2px solid var(--primary);font-size:1rem;font-family:inherit;background:var(--input-bg);color:var(--text-main);">
+                <button class="btn" style="width:200px;" onclick="createClass()">🏫 建立班級</button>
+            </div>
+
+            <!-- 有班級時：儀表板主體 -->
+            <div id="teacher-has-class" style="display:none;flex-direction:column;flex:1;min-height:0;">
+                <!-- 班級名稱 + 邀請碼 -->
+                <div class="invite-code-box" id="teacher-invite-box">
+                    <div class="invite-code-label">班級邀請碼（讓學生輸入此碼加入）</div>
+                    <div class="invite-code-num" id="teacher-invite-code">------</div>
+                    <div class="invite-code-actions">
+                        <button class="invite-code-btn copy" onclick="copyInviteCode()">📋 複製</button>
+                        <button class="invite-code-btn reset" onclick="resetInviteCode()">🔄 重設邀請碼</button>
+                    </div>
+                </div>
+
+                <!-- Tab 切換 -->
+                <div class="class-tab-bar" style="flex-shrink:0;">
+                    <button class="class-tab-btn active" id="tab-members-btn" onclick="switchTeacherTab('members')">👥 學生列表</button>
+                    <button class="class-tab-btn" id="tab-assign-btn" onclick="switchTeacherTab('assign')">📚 指派清單</button>
+                </div>
+
+                <!-- 學生列表 panel -->
+                <div id="teacher-members-panel" style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+                    <div id="teacher-members-list"></div>
+                    <div id="teacher-no-members" style="display:none;color:var(--text-muted);text-align:center;padding:20px;font-size:0.9rem;">還沒有學生加入 🎓<br>把邀請碼分享給學生吧！</div>
+                </div>
+
+                <!-- 指派清單 panel -->
+                <div id="teacher-assign-panel" style="display:none;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+                    <!-- 編輯單字庫 panel（疊在上面） -->
+                    <div id="assignment-edit-panel">
+                        <div class="edit-panel-back" onclick="closeAssignmentEdit()">← 返回指派列表</div>
+                        <div id="edit-assign-title" style="font-size:1rem;font-weight:bold;color:var(--text-main);margin-bottom:8px;flex-shrink:0;"></div>
+                        <!-- 單字列表（可編輯） -->
+                        <div id="edit-assign-rows-container" style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:8px;"></div>
+                        <div style="display:flex;gap:8px;flex-shrink:0;">
+                            <button class="btn" style="flex:1;margin:0;font-size:0.9rem;" onclick="addAssignWordRow()">＋ 新增單字</button>
+                            <button class="btn" style="flex:1;margin:0;font-size:0.9rem;background:var(--primary);color:#fff;box-shadow:0 4px 0 #2e6494;" onclick="saveAssignmentEdit()">💾 儲存</button>
+                        </div>
+                    </div>
+                    <!-- 清單列表 -->
+                    <div id="teacher-assign-list"></div>
+                    <div id="teacher-no-lists" style="display:none;color:var(--text-muted);text-align:center;padding:20px;font-size:0.9rem;">你還沒有自訂單字庫<br>先到「自訂單字庫」建立清單吧！</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2960,6 +3262,12 @@
         let currentUser = null;
         let currentUserDoc = null;
 
+        // Class 系統狀態變數（宣告在這裡，讓 onAuthStateChanged 可以存取）
+        let currentClassDoc = null;
+        let currentClassId  = null;
+        let classAssignments = [];
+        let editingAssignId  = null;
+
         // ── 從 Firestore 讀取 user doc，新用戶自動建立預設 doc ──
         async function loadUserDoc(user) {
             try {
@@ -3003,11 +3311,7 @@
             return !!currentUserDoc.classId;
         }
 
-        // ── 是否是老師 ──
-        function isTeacher() {
-            if (!currentUserDoc) return false;
-            return currentUserDoc.role === 'teacher';
-        }
+        // isTeacher() 定義在 Class 系統區塊，這裡不重複
 
         // ── Pro 功能守衛：未登入導向登入，已登入但非 Pro 顯示升級提示 ──
         function requirePro(featureName) {
@@ -3060,9 +3364,14 @@
         auth.onAuthStateChanged(async (user) => {
             currentUser = user;
             currentUserDoc = null;
+            currentClassDoc = null;
+            currentClassId  = null;
             if (user) {
                 await loadUserDoc(user);
                 await loadFromCloud(user);
+                await loadClassData();
+            } else {
+                updateClassUI();
             }
             updateAccountChip(user);
             updateSidebarLocks();
@@ -3345,6 +3654,484 @@
             const titleMap = { easy: "🏫 國小模式", normal: "🏛️ 國中模式", hard: "🎓 高中模式" };
             document.getElementById('pre-title').innerText = titleMap[gameState.currentDifficulty];
             document.getElementById('pre-desc').innerText = `設定：${mins} 分鐘，準備好了嗎？`;
+            document.getElementById('pre-game-start').style.display = 'block';
+        }
+
+        // ════════════════════════════════════════════════════════
+        //  CLASS 系統
+        // ════════════════════════════════════════════════════════
+
+        // （狀態變數已在帳戶系統頂部宣告）
+
+        // ── isTeacher（含 admin 測試）──
+        function isTeacher() {
+            if (!currentUserDoc) return false;
+            return currentUserDoc.role === 'teacher' || currentUserDoc.role === 'admin';
+        }
+
+        // ── UI 更新：帳戶彈窗裡的 Class 相關區塊 ──
+        function updateClassUI() {
+            const loggedIn = !!currentUser;
+            const teacher  = isTeacher();
+            const hasClass = hasClassAccess();   // classId 非 null
+
+            // 老師儀表板按鈕
+            const dashBtn = document.getElementById('teacher-dashboard-btn');
+            if (dashBtn) dashBtn.style.display = (loggedIn && teacher) ? '' : 'none';
+
+            // 加入班級輸入框（非老師、未加入班級）
+            const joinWrap = document.getElementById('join-class-popup-wrap');
+            if (joinWrap) joinWrap.style.display = (loggedIn && !teacher && !hasClass) ? '' : 'none';
+
+            // 已加入班級資訊（學生）
+            const memberWrap = document.getElementById('class-member-info-wrap');
+            if (memberWrap) {
+                memberWrap.style.display = (loggedIn && !teacher && hasClass) ? '' : 'none';
+                if (hasClass && currentClassDoc) {
+                    const chip = document.getElementById('class-name-chip');
+                    if (chip) chip.textContent = currentClassDoc.name || '班級';
+                }
+            }
+
+            // 側邊欄教室區按鈕（老師或學生，只要有 classId）
+            const classSection = document.getElementById('classroom-section');
+            if (classSection) classSection.style.display = (loggedIn && (teacher || hasClass)) ? '' : 'none';
+        }
+
+        // ── 登入後載入班級資料 ──
+        async function loadClassData() {
+            const classId = currentUserDoc?.classId;
+            currentClassId  = classId || null;
+            currentClassDoc = null;
+
+            // 老師：用 teacherUid 查自己的班級
+            if (isTeacher()) {
+                try {
+                    const snap = await db.collection('classes')
+                        .where('teacherUid', '==', currentUser.uid)
+                        .limit(1).get();
+                    if (!snap.empty) {
+                        currentClassDoc = snap.docs[0].data();
+                        currentClassId  = snap.docs[0].id;
+                    }
+                } catch(e) { console.warn('老師載入班級失敗', e); }
+            } else if (classId) {
+                // 學生：直接讀 classId
+                try {
+                    const snap = await db.collection('classes').doc(classId).get();
+                    if (snap.exists) {
+                        currentClassDoc = snap.data();
+                        currentClassId  = classId;
+                    }
+                } catch(e) { console.warn('學生載入班級失敗', e); }
+            }
+            updateClassUI();
+        }
+
+        // ── 學生：輸入邀請碼加入班級 ──
+        async function joinClassByCode() {
+            const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+            const infoEl = document.getElementById('join-class-info');
+            infoEl.className = 'join-class-info show';
+            if (code.length !== 6) { infoEl.style.color = '#e74c3c'; infoEl.textContent = '邀請碼為 6 碼'; return; }
+            infoEl.style.color = 'var(--text-muted)'; infoEl.textContent = '查詢中…';
+            try {
+                const snap = await db.collection('classes').where('inviteCode', '==', code).limit(1).get();
+                if (snap.empty) { infoEl.style.color = '#e74c3c'; infoEl.textContent = '❌ 找不到此邀請碼'; return; }
+                const classDoc = snap.docs[0];
+                const classId  = classDoc.id;
+                const classData = classDoc.data();
+                // 人數上限檢查
+                const memberLimit = classData.memberLimit || 0;
+                const memberCount = (classData.members || []).length;
+                if (memberLimit > 0 && memberCount >= memberLimit) {
+                    infoEl.style.color = '#e74c3c'; infoEl.textContent = '❌ 班級人數已滿'; return;
+                }
+                // 把自己加進 members
+                await db.collection('classes').doc(classId).update({
+                    members: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+                });
+                // 更新自己的 user doc classId（需要用 admin SDK 繞過 rules，
+                // 但這裡學生寫自己的 classId 被 rules 擋住了，所以用 Cloud Function 或改 rules）
+                // ★ 暫時方案：用 admin 帳號可測試；正式需搭配 Cloud Function
+                await db.collection('users').doc(currentUser.uid).update({ classId });
+                // 重新載入
+                currentUserDoc = { ...currentUserDoc, classId };
+                currentClassDoc = classData; currentClassId = classId;
+                updateClassUI(); updatePlanBadge();
+                infoEl.style.color = '#27ae60';
+                infoEl.textContent = `✅ 成功加入「${classData.name}」！`;
+                document.getElementById('join-code-input').value = '';
+                showToast(`🏫 已加入班級「${classData.name}」！`);
+            } catch(e) {
+                infoEl.style.color = '#e74c3c';
+                infoEl.textContent = '❌ 加入失敗：' + e.message;
+            }
+        }
+
+        // ── 學生：離開班級 ──
+        async function confirmLeaveClass() {
+            if (!confirm('確定要離開班級嗎？離開後需要重新輸入邀請碼才能加入。')) return;
+            try {
+                await db.collection('classes').doc(currentClassId).update({
+                    members: firebase.firestore.FieldValue.arrayRemove(currentUser.uid)
+                });
+                await db.collection('users').doc(currentUser.uid).update({ classId: null });
+                currentUserDoc = { ...currentUserDoc, classId: null };
+                currentClassDoc = null; currentClassId = null;
+                updateClassUI(); updatePlanBadge();
+                closeAccountPopup();
+                showToast('👋 已離開班級');
+            } catch(e) { showToast('❌ 離開失敗：' + e.message); }
+        }
+
+        // ════════════════════════════════
+        //  老師儀表板
+        // ════════════════════════════════
+
+        async function showTeacherDashboard() {
+            closeAccountPopup();
+            showModal('teacher-dashboard-modal');
+            if (!currentClassId) {
+                document.getElementById('teacher-no-class').style.display = 'flex';
+                document.getElementById('teacher-has-class').style.display = 'none';
+            } else {
+                document.getElementById('teacher-no-class').style.display = 'none';
+                document.getElementById('teacher-has-class').style.display = 'flex';
+                renderTeacherInviteCode();
+                switchTeacherTab('members');
+            }
+        }
+
+        // ── 老師：建立班級 ──
+        async function createClass() {
+            const name = document.getElementById('new-class-name-input').value.trim();
+            if (!name) { showToast('請輸入班級名稱'); return; }
+            const code = generateCode();
+            try {
+                const ref = await db.collection('classes').add({
+                    teacherUid: currentUser.uid,
+                    name, inviteCode: code,
+                    memberLimit: 0, members: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                // 更新 teacher 的 classId（admin 才能改 classId，這裡 admin 測試用）
+                await db.collection('users').doc(currentUser.uid).update({ classId: ref.id });
+                currentUserDoc = { ...currentUserDoc, classId: ref.id };
+                currentClassId  = ref.id;
+                currentClassDoc = { teacherUid: currentUser.uid, name, inviteCode: code, members: [] };
+                updateClassUI();
+                document.getElementById('teacher-no-class').style.display = 'none';
+                document.getElementById('teacher-has-class').style.display = 'flex';
+                renderTeacherInviteCode();
+                switchTeacherTab('members');
+                showToast(`🏫 班級「${name}」建立成功！`);
+            } catch(e) { showToast('❌ 建立失敗：' + e.message); }
+        }
+
+        function generateCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+            return code;
+        }
+
+        function renderTeacherInviteCode() {
+            const code = currentClassDoc?.inviteCode || '------';
+            document.getElementById('teacher-invite-code').textContent = code;
+        }
+
+        function copyInviteCode() {
+            const code = currentClassDoc?.inviteCode || '';
+            navigator.clipboard?.writeText(code).then(() => showToast('📋 邀請碼已複製：' + code))
+                .catch(() => showToast('邀請碼：' + code));
+        }
+
+        async function resetInviteCode() {
+            if (!confirm('確定要重設邀請碼嗎？舊邀請碼將立即失效。')) return;
+            const newCode = generateCode();
+            try {
+                await db.collection('classes').doc(currentClassId).update({ inviteCode: newCode });
+                currentClassDoc = { ...currentClassDoc, inviteCode: newCode };
+                renderTeacherInviteCode();
+                showToast('🔄 邀請碼已更新：' + newCode);
+            } catch(e) { showToast('❌ 更新失敗：' + e.message); }
+        }
+
+        // ── 老師：Tab 切換 ──
+        function switchTeacherTab(tab) {
+            document.getElementById('teacher-members-panel').style.display = tab === 'members' ? '' : 'none';
+            document.getElementById('teacher-assign-panel').style.display  = tab === 'assign'  ? '' : 'none';
+            document.getElementById('tab-members-btn').className = 'class-tab-btn' + (tab === 'members' ? ' active' : '');
+            document.getElementById('tab-assign-btn').className  = 'class-tab-btn' + (tab === 'assign'  ? ' active' : '');
+            if (tab === 'members') renderTeacherMembers();
+            if (tab === 'assign')  renderTeacherAssignList();
+        }
+
+        // ── 老師：學生列表 ──
+        async function renderTeacherMembers() {
+            const listEl = document.getElementById('teacher-members-list');
+            const noEl   = document.getElementById('teacher-no-members');
+            listEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem;padding:8px 0;">載入中…</div>';
+            try {
+                const snap = await db.collection('classes').doc(currentClassId).get();
+                const members = snap.data()?.members || [];
+                currentClassDoc = { ...currentClassDoc, members };
+                if (members.length === 0) {
+                    listEl.innerHTML = ''; noEl.style.display = 'block'; return;
+                }
+                noEl.style.display = 'none';
+                // 批次讀學生名稱（每次最多 10 個）
+                const chunks = [];
+                for (let i = 0; i < members.length; i += 10) chunks.push(members.slice(i, i+10));
+                let userDocs = [];
+                for (const chunk of chunks) {
+                    const res = await db.collection('users').where(firebase.firestore.FieldPath.documentId(), 'in', chunk).get();
+                    res.forEach(d => userDocs.push({ uid: d.id, ...d.data() }));
+                }
+                listEl.innerHTML = userDocs.map(u => `
+                    <div class="member-row">
+                        <div>
+                            <div class="member-name">${u.displayName || u.email || u.uid}</div>
+                            <div class="member-sub">${u.email || ''}</div>
+                        </div>
+                        <button class="member-kick-btn" onclick="kickMember('${u.uid}', '${(u.displayName||u.uid).replace(/'/g,'')}')">移除</button>
+                    </div>
+                `).join('');
+            } catch(e) {
+                listEl.innerHTML = `<div style="color:#e74c3c;font-size:0.85rem;">載入失敗：${e.message}</div>`;
+            }
+        }
+
+        async function kickMember(uid, name) {
+            if (!confirm(`確定要將「${name}」移出班級嗎？`)) return;
+            try {
+                await db.collection('classes').doc(currentClassId).update({
+                    members: firebase.firestore.FieldValue.arrayRemove(uid)
+                });
+                // 清除學生 classId（需要 admin 權限）
+                await db.collection('users').doc(uid).update({ classId: null });
+                showToast(`✅ 已移除「${name}」`);
+                renderTeacherMembers();
+            } catch(e) { showToast('❌ 移除失敗：' + e.message); }
+        }
+
+        // ── 老師：指派清單列表 ──
+        async function renderTeacherAssignList() {
+            closeAssignmentEdit();
+            const listEl = document.getElementById('teacher-assign-list');
+            const noEl   = document.getElementById('teacher-no-lists');
+            listEl.innerHTML = '';
+
+            // 讀現有的 assignments
+            let assigned = {};
+            try {
+                const aSnap = await db.collection('classes').doc(currentClassId)
+                    .collection('assignments').get();
+                aSnap.forEach(d => { assigned[d.data().wordListKey] = d.id; });
+            } catch(e) {}
+
+            // 老師自己的自訂單字庫
+            const myLists = Object.keys(gameState.customData);
+            if (myLists.length === 0) {
+                noEl.style.display = 'block'; listEl.innerHTML = ''; return;
+            }
+            noEl.style.display = 'none';
+
+            listEl.innerHTML = myLists.map(name => {
+                const isAssigned = !!assigned[name];
+                const assignId   = assigned[name] || '';
+                const count = gameState.customData[name]?.length || 0;
+                return `
+                <div class="assign-list-item ${isAssigned ? 'assigned' : ''}" id="assign-item-${CSS.escape(name)}">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);">${count} 個單字${isAssigned ? '・已指派' : ''}</div>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-shrink:0;">
+                        ${isAssigned ? `<button class="assign-toggle-btn remove" onclick="unassignList('${assignId}','${name.replace(/'/g,"\\'")}')">取消指派</button>
+                        <button class="assign-toggle-btn add" style="background:#1a5276;" onclick="openAssignmentEdit('${assignId}','${name.replace(/'/g,"\\'")}')">✏️ 編輯</button>` 
+                        : `<button class="assign-toggle-btn add" onclick="assignList('${name.replace(/'/g,"\\'")}')">指派給班級</button>`}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function assignList(listName) {
+            const data = gameState.customData[listName];
+            if (!data) return;
+            try {
+                await db.collection('classes').doc(currentClassId)
+                    .collection('assignments').add({
+                        wordListKey:  listName,
+                        wordListData: data,   // 快照
+                        assignedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                showToast(`📚 已指派「${listName}」給班級！`);
+                renderTeacherAssignList();
+            } catch(e) { showToast('❌ 指派失敗：' + e.message); }
+        }
+
+        async function unassignList(assignId, listName) {
+            if (!confirm(`確定要取消指派「${listName}」嗎？`)) return;
+            try {
+                await db.collection('classes').doc(currentClassId)
+                    .collection('assignments').doc(assignId).delete();
+                showToast(`🗑️ 已取消指派「${listName}」`);
+                renderTeacherAssignList();
+            } catch(e) { showToast('❌ 取消失敗：' + e.message); }
+        }
+
+        // ── 老師：編輯指派的單字庫（快照版，不影響原始清單）──
+        async function openAssignmentEdit(assignId, listName) {
+            editingAssignId = assignId;
+            document.getElementById('edit-assign-title').textContent = `✏️ 編輯：${listName}（教室版）`;
+            // 讀 Firestore 的快照
+            try {
+                const snap = await db.collection('classes').doc(currentClassId)
+                    .collection('assignments').doc(assignId).get();
+                const words = snap.data()?.wordListData || [];
+                const container = document.getElementById('edit-assign-rows-container');
+                container.innerHTML = '';
+                words.forEach(w => appendAssignRow(container, w.eng, w.chi));
+            } catch(e) { showToast('❌ 載入失敗：' + e.message); return; }
+            document.getElementById('teacher-assign-list').style.display = 'none';
+            document.getElementById('teacher-no-lists').style.display = 'none';
+            document.getElementById('assignment-edit-panel').classList.add('show');
+        }
+
+        function appendAssignRow(container, eng, chi) {
+            const row = document.createElement('div');
+            row.className = 'word-row';
+            row.innerHTML = `<input type="text" class="eng-in" placeholder="英文" value="${eng||''}" inputmode="none"><input type="text" class="chi-in" placeholder="中文" value="${chi||''}" inputmode="none"><button onclick="safeRemoveRow(this)" style="border:none;background:none;cursor:pointer;color:#999;">❌</button>`;
+            container.appendChild(row);
+        }
+
+        function addAssignWordRow() {
+            appendAssignRow(document.getElementById('edit-assign-rows-container'), '', '');
+        }
+
+        async function saveAssignmentEdit() {
+            const rows = document.getElementById('edit-assign-rows-container').querySelectorAll('.word-row');
+            const words = [];
+            rows.forEach(r => {
+                const eng = r.querySelector('.eng-in').value.trim().toLowerCase();
+                const chi = r.querySelector('.chi-in').value.trim();
+                if (eng && chi) words.push({ eng, chi });
+            });
+            if (words.length === 0) { showToast('請至少輸入一組單字'); return; }
+            try {
+                await db.collection('classes').doc(currentClassId)
+                    .collection('assignments').doc(editingAssignId)
+                    .update({ wordListData: words, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                showToast('💾 已儲存！（原始清單不受影響）');
+                closeAssignmentEdit();
+                renderTeacherAssignList();
+            } catch(e) { showToast('❌ 儲存失敗：' + e.message); }
+        }
+
+        function closeAssignmentEdit() {
+            editingAssignId = null;
+            document.getElementById('assignment-edit-panel').classList.remove('show');
+            document.getElementById('teacher-assign-list').style.display = '';
+        }
+
+        // ════════════════════════════════
+        //  學生端：教室區
+        // ════════════════════════════════
+
+        let selectedAssignment = null;  // 目前選中的指派清單
+
+        async function showClassroomModal() {
+            closeSidebar();
+            showModal('classroom-modal');
+            document.getElementById('classroom-class-name').textContent =
+                currentClassDoc?.name ? `📚 ${currentClassDoc.name}` : '';
+            document.getElementById('classroom-mode-select').style.display = 'none';
+            document.getElementById('classroom-list-view').style.display   = 'flex';
+            await loadAndRenderAssignments();
+        }
+
+        async function loadAndRenderAssignments() {
+            const display = document.getElementById('classroom-assignments-display');
+            display.innerHTML = '<div style="color:var(--text-muted);padding:12px 0;">載入中…</div>';
+            try {
+                const snap = await db.collection('classes').doc(currentClassId)
+                    .collection('assignments').orderBy('assignedAt', 'desc').get();
+                classAssignments = [];
+                snap.forEach(d => classAssignments.push({ id: d.id, ...d.data() }));
+                if (classAssignments.length === 0) {
+                    display.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:24px;font-size:0.95rem;">老師還沒有指派單字清單 📭</div>';
+                    return;
+                }
+                display.innerHTML = classAssignments.map((a, i) => {
+                    const count = a.wordListData?.length || 0;
+                    const date  = a.assignedAt?.toDate ? a.assignedAt.toDate().toLocaleDateString('zh-TW') : '';
+                    return `
+                    <div class="assignment-card" onclick="openClassroomModeSelect(${i})">
+                        <div>
+                            <div>${a.wordListKey}</div>
+                            <div class="assignment-meta">共 ${count} 個單字${date ? '・' + date : ''}</div>
+                        </div>
+                        <span style="font-size:1.5rem;">▶</span>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                display.innerHTML = `<div style="color:#e74c3c;font-size:0.85rem;">載入失敗：${e.message}</div>`;
+            }
+        }
+
+        function openClassroomModeSelect(index) {
+            selectedAssignment = classAssignments[index];
+            document.getElementById('classroom-mode-title').textContent =
+                `📂 ${selectedAssignment.wordListKey}（${selectedAssignment.wordListData?.length || 0} 個單字）`;
+            document.getElementById('classroom-list-view').style.display   = 'none';
+            document.getElementById('classroom-mode-select').style.display = 'flex';
+        }
+
+        function closeClassroomModeSelect() {
+            selectedAssignment = null;
+            document.getElementById('classroom-mode-select').style.display = 'none';
+            document.getElementById('classroom-list-view').style.display   = 'flex';
+        }
+
+        function launchClassroomMode(type) {
+            if (!selectedAssignment) return;
+            const data   = selectedAssignment.wordListData || [];
+            const repeat = parseInt(document.getElementById('classroom-repeat-count').value) || 1;
+            if (data.length === 0) { showToast('這份清單是空的！'); return; }
+
+            gameState.tempDictionary = {};
+            gameState.currentList    = [];
+            gameState.examErrors     = [];
+            data.forEach(item => {
+                const key = item.eng.toLowerCase();
+                gameState.tempDictionary[key] = item.chi;
+                for (let i = 0; i < repeat; i++) gameState.currentList.push(key);
+            });
+            if (type === 'exam' || type === 'test') {
+                for (let i = gameState.currentList.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [gameState.currentList[i], gameState.currentList[j]] = [gameState.currentList[j], gameState.currentList[i]];
+                }
+            }
+            gameState.testMode  = (type === 'test' || type === 'exam');
+            gameState.examMode  = (type === 'exam');
+            gameState.repeatCount = repeat;
+            gameState.activeListName = selectedAssignment.wordListKey;
+            gameState.sourceType = 'custom';
+            gameState.pendingTimeLeft = 0;
+
+            hideModal('classroom-modal');
+            clearUI();
+            gameState.mode = 'word'; gameState.subMode = 'custom';
+            let title = '基礎練習';
+            if (type === 'test') title = '拼字練習';
+            if (type === 'exam') title = '考試模式';
+            document.getElementById('pre-title').innerHTML =
+                `🏫 ${selectedAssignment.wordListKey}<br><span style="font-size:0.7em;">${title}</span>`;
+            document.getElementById('pre-desc').innerText =
+                `共 ${data.length} 個單字 × ${repeat} 次 = ${gameState.currentList.length} 題`;
             document.getElementById('pre-game-start').style.display = 'block';
         }
     </script>
