@@ -1206,30 +1206,36 @@
         <div class="modal-content">
             <button onclick="hideModal('custom-modal')" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--text-muted); line-height:1; padding:4px 8px; border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--card-border)'" onmouseout="this.style.background='none'">✕</button>
             <h3 style="color: var(--primary); font-size: 1.8rem; margin-top: 0;">✏️ 自訂單字庫管理</h3>
-            <div id="list-creation-area">
+
+            <!-- Tab 切換列 -->
+            <div style="display:flex; gap:6px; margin-bottom:16px;">
+                <button id="tab-create-btn" onclick="switchCustomTab('create')" style="flex:1; padding:9px 0; border:none; border-radius:10px; font-size:0.95rem; font-weight:bold; cursor:pointer; font-family:inherit; background:var(--primary); color:#fff; transition:all 0.2s;">✏️ 建立清單</button>
+                <button id="tab-mylist-btn" onclick="switchCustomTab('mylist')" style="flex:1; padding:9px 0; border:none; border-radius:10px; font-size:0.95rem; font-weight:bold; cursor:pointer; font-family:inherit; background:var(--card-bg); color:var(--text-muted); border:2px solid var(--card-border); transition:all 0.2s;">📚 我的清單</button>
+            </div>
+
+            <!-- Tab：建立清單 -->
+            <div id="tab-create-panel">
+                <div id="edit-mode-banner" style="display:none; background:#FFF3CD; border:2px solid #FFC107; border-radius:10px; padding:8px 14px; margin-bottom:10px; font-size:0.95rem; color:#856404; font-weight:bold;">
+                    ✏️ 正在編輯：<span id="edit-mode-name"></span>
+                    <button onclick="cancelEdit()" style="float:right;border:none;background:none;cursor:pointer;color:#856404;font-size:1rem;">✖ 取消</button>
+                </div>
                 <div style="display:flex; gap:8px; margin-bottom:12px; align-items:stretch;">
                     <input type="text" id="new-list-name" placeholder="清單名稱 (如：第五課單字)" inputmode="none" style="flex:1; padding:10px; border-radius:10px; border:2px solid var(--primary); font-size: 1rem; font-family: inherit; background: var(--input-bg); color: var(--text-main);">
                     <button class="btn" style="width:auto; padding:10px 16px; font-size:0.9rem; margin-bottom:0; white-space:nowrap;" onclick="saveCustomList()" id="save-list-btn">💾 儲存</button>
                 </div>
-                <div id="custom-rows-container" style="overflow-x: hidden; -webkit-overflow-scrolling: touch; margin-bottom:12px; border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; background: var(--bg);">
+                <div id="custom-rows-container" style="overflow-x: hidden; -webkit-overflow-scrolling: touch; margin-bottom:4px; border: 1px solid var(--card-border); padding: 10px; border-radius: 12px; background: var(--bg);">
                     <div class="word-row">
                         <input type="text" class="eng-in" placeholder="英文" inputmode="none">
                         <input type="text" class="chi-in" placeholder="中文" inputmode="none">
                         <button onclick="safeRemoveRow(this)" style="border:none; background:none; cursor:pointer; color:#999;">❌</button>
                     </div>
                 </div>
-                <div id="edit-mode-banner" style="display:none; background:#FFF3CD; border:2px solid #FFC107; border-radius:10px; padding:8px 14px; margin-bottom:8px; font-size:0.95rem; color:#856404; font-weight:bold;">
-                    ✏️ 正在編輯：<span id="edit-mode-name"></span>
-                    <button onclick="cancelEdit()" style="float:right;border:none;background:none;cursor:pointer;color:#856404;font-size:1rem;">✖ 取消</button>
-                </div>
             </div>
-            <div style="display:flex; align-items:center; gap:10px; margin: 14px 0 10px 0;">
-                <div style="flex:1; height:2px; background: linear-gradient(to right, var(--primary), transparent); border-radius:1px; opacity:0.35;"></div>
-                <span style="font-size:0.8rem; font-weight:bold; color:var(--text-muted); white-space:nowrap; letter-spacing:0.05em;">我的收藏清單</span>
-                <div style="flex:1; height:2px; background: linear-gradient(to left, var(--primary), transparent); border-radius:1px; opacity:0.35;"></div>
-            </div>
-            <div id="saved-lists-display" style="text-align: left; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 120px;"></div>
 
+            <!-- Tab：我的清單 -->
+            <div id="tab-mylist-panel" style="display:none;">
+                <div id="saved-lists-display" style="text-align: left; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 120px;"></div>
+            </div>
         </div>
     </div>
 
@@ -1843,13 +1849,8 @@
             gameState.customData[name] = data;
             localStorage.setItem('user_custom_lists', JSON.stringify(gameState.customData));
             _resetEditForm();
-            renderSavedLists();
-            // 滾動到清單區讓使用者看到結果
-            setTimeout(() => {
-                const el = document.getElementById('saved-lists-display');
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
             showToast(oldName ? `「${name}」已更新！` : `「${name}」已儲存！`);
+            switchCustomTab('mylist');
             autoSyncCustomLists();
         }
 
@@ -1861,11 +1862,28 @@
             const container = document.getElementById('custom-rows-container');
             attachRowAutoAdd(container.querySelector('.word-row'));
             document.getElementById('edit-mode-banner').style.display = 'none';
-            document.getElementById('save-list-btn').textContent = '💾 儲存這份單字清單';
+            document.getElementById('save-list-btn').textContent = '💾 儲存';
+        }
+
+        function switchCustomTab(tab) {
+            const isCreate = tab === 'create';
+            document.getElementById('tab-create-panel').style.display = isCreate ? '' : 'none';
+            document.getElementById('tab-mylist-panel').style.display = isCreate ? 'none' : '';
+            const btnCreate = document.getElementById('tab-create-btn');
+            const btnMylist = document.getElementById('tab-mylist-btn');
+            if (isCreate) {
+                btnCreate.style.background = 'var(--primary)'; btnCreate.style.color = '#fff'; btnCreate.style.border = 'none';
+                btnMylist.style.background = 'var(--card-bg)'; btnMylist.style.color = 'var(--text-muted)'; btnMylist.style.border = '2px solid var(--card-border)';
+            } else {
+                btnMylist.style.background = 'var(--primary)'; btnMylist.style.color = '#fff'; btnMylist.style.border = 'none';
+                btnCreate.style.background = 'var(--card-bg)'; btnCreate.style.color = 'var(--text-muted)'; btnCreate.style.border = '2px solid var(--card-border)';
+                renderSavedLists();
+            }
         }
 
         function cancelEdit() {
             _resetEditForm();
+            switchCustomTab('create');
         }
 
         function renderSavedLists() {
@@ -1921,7 +1939,7 @@
             // 顯示編輯模式 banner
             document.getElementById('edit-mode-name').textContent = name;
             document.getElementById('edit-mode-banner').style.display = 'block';
-            document.getElementById('save-list-btn').textContent = '💾 更新清單';
+            document.getElementById('save-list-btn').textContent = '💾 更新';
             // 重建單字列
             const container = document.getElementById('custom-rows-container');
             container.innerHTML = '';
@@ -1931,7 +1949,8 @@
                 attachRowAutoAdd(row);
                 container.appendChild(row);
             });
-            // 滾動 modal 內容到頂部（scrollTop on modal-content）
+            // 切換到建立清單 tab 並滾到頂部
+            switchCustomTab('create');
             const modalContent = document.querySelector('#custom-modal .modal-content');
             if (modalContent) modalContent.scrollTop = 0;
         }
