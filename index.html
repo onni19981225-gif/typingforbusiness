@@ -1273,12 +1273,46 @@
                             <div class="popup-email" id="popup-email">載入中...</div>
                         </div>
                     </div>
-                    <span class="plan-badge" id="plan-badge-display">🆓 免費版</span>
+                    <span style="display:inline-flex;align-items:center;gap:5px;">
+                        <span class="plan-badge" id="plan-badge-display">🆓 免費版</span>
+                        <button onclick="showPlanInfoModal()" style="background:none;border:none;cursor:pointer;padding:0;line-height:1;font-size:14px;color:var(--text-muted);transition:color 0.2s;" title="查看方案說明">ⓘ</button>
+                    </span>
+
+                    <!-- 方案說明 Modal -->
+                    <div id="plan-info-modal" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;">
+                        <div onclick="hidePlanInfoModal()" style="position:absolute;inset:0;background:rgba(0,0,0,0.45);"></div>
+                        <div style="position:relative;background:var(--card-bg);border-radius:18px;padding:24px 20px 20px;width:320px;max-width:92vw;box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:1;">
+                            <button onclick="hidePlanInfoModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);">✕</button>
+                            <div style="font-size:1rem;font-weight:bold;margin-bottom:16px;color:var(--text-main);">📋 方案功能對照</div>
+                            <table style="width:100%;border-collapse:collapse;font-size:0.82rem;color:var(--text-main);">
+                                <thead>
+                                    <tr style="border-bottom:2px solid var(--card-border);">
+                                        <th style="text-align:left;padding:5px 4px;font-weight:bold;">功能</th>
+                                        <th style="text-align:center;padding:5px 4px;font-weight:bold;">Free</th>
+                                        <th style="text-align:center;padding:5px 4px;font-weight:bold;">Pro</th>
+                                        <th style="text-align:center;padding:5px 4px;font-weight:bold;color:#92400E;">Max</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td style="padding:6px 4px;">初心者、國小</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td></tr>
+                                    <tr style="background:var(--bg);"><td style="padding:6px 4px;">國中、高中</td><td style="text-align:center;">❌</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td></tr>
+                                    <tr><td style="padding:6px 4px;">自訂清單（3份/10字）</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td></tr>
+                                    <tr style="background:var(--bg);"><td style="padding:6px 4px;">自訂清單（5份/無上限）</td><td style="text-align:center;">❌</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td></tr>
+                                    <tr><td style="padding:6px 4px;">待複習清單</td><td style="text-align:center;">❌</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td></tr>
+                                    <tr style="background:var(--bg);"><td style="padding:6px 4px;">拼字練習、考試模式</td><td style="text-align:center;">❌</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td></tr>
+                                    <tr><td style="padding:6px 4px;">雲端同步</td><td style="text-align:center;">❌</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td></tr>
+                                    <tr style="background:var(--bg);"><td style="padding:6px 4px;">句子模式</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td><td style="text-align:center;">✅</td></tr>
+                                    <tr><td style="padding:6px 4px;">無限清單</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td><td style="text-align:center;">✅</td></tr>
+                                </tbody>
+                            </table>
+                            <div style="margin-top:14px;font-size:0.75rem;color:var(--text-muted);text-align:center;">現在登入即享 🏆 Pro Max 全功能！</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="popup-section">
-                    <button id="upgrade-pro-btn" class="popup-item upgrade" onclick="showToast('💎 請聯絡老師或前往官網升級 Pro！')">
-                        <span class="pi-icon">🚀</span>
-                        <span>升級 Pro 會員<span class="pi-sub">雲端同步・無限單字庫・進階統計</span></span>
+                    <button id="upgrade-pro-btn" class="popup-item upgrade" onclick="showToast('👆 登入即可解鎖所有功能！')">
+                        <span class="pi-icon">🔓</span>
+                        <span>登入解鎖全功能<span class="pi-sub">單字庫・拼字練習・考試模式・更多</span></span>
                     </button>
                 </div>
                 <div class="popup-section">
@@ -2225,6 +2259,15 @@
                 item.addEventListener('click', () => openModeSelect(name));
                 display.appendChild(item);
             });
+        }
+
+        function showPlanInfoModal() {
+            const m = document.getElementById("plan-info-modal");
+            if (m) { m.style.display = "flex"; }
+        }
+        function hidePlanInfoModal() {
+            const m = document.getElementById("plan-info-modal");
+            if (m) { m.style.display = "none"; }
         }
 
         function showToast(msg, duration=2000) {
@@ -3299,10 +3342,9 @@
             return currentUserDoc.plan || 'free';
         }
 
-        // ── 是否有 Pro / Lifetime / Class 老師權限 ──
+        // ── 是否有 Pro Max 權限（試用期：登入即享 Pro Max）──
         function hasPro() {
-            const plan = getUserPlan();
-            return plan === 'pro' || plan === 'lifetime' || (plan === 'class' && isTeacher());
+            return !!currentUser;
         }
 
         // ── 是否有教室區權限（綁定學生 or 老師）──
@@ -3326,7 +3368,7 @@
                 document.getElementById('sidebar').classList.add('open');
                 document.getElementById('sidebar-overlay').classList.add('show');
                 document.getElementById('account-popup').classList.add('show');
-                showToast('⭐ 請升級 Pro 以使用「' + featureName + '」功能');
+                showToast('🔒 請先登入以使用「' + featureName + '」功能');
                 return false;
             }
             return true;
@@ -3346,18 +3388,18 @@
         function updatePlanBadge() {
             const badge = document.getElementById('plan-badge-display');
             if (!badge) return;
-            const plan = getUserPlan();
             const isDark = document.body.classList.contains('dark');
-            const configs = {
-                free:     { text: '🆓 免費版',   bg: '#e8e8e8', color: '#666',    darkBg: '#2a2a2a', darkColor: '#aaa' },
-                pro:      { text: '💎 Pro 會員', bg: '#DBEAFE', color: '#1E40AF', darkBg: '#1e2d4a', darkColor: '#60A5FA' },
-                lifetime: { text: '🏆 Lifetime', bg: '#FEF3C7', color: '#92400E', darkBg: '#3a2e1a', darkColor: '#EF9F27' },
-                class:    { text: '🎓 Class',    bg: '#EDE9FE', color: '#5B21B6', darkBg: '#2d1f4a', darkColor: '#A78BFA' },
-            };
-            const cfg = configs[plan] || configs.free;
-            badge.textContent = cfg.text;
-            badge.style.background = isDark ? cfg.darkBg : cfg.bg;
-            badge.style.color = isDark ? cfg.darkColor : cfg.color;
+            if (currentUser) {
+                // 已登入：顯示解鎖狀態
+                badge.textContent = '🏆 Pro Max';
+                badge.style.background = isDark ? '#1e2d4a' : '#DBEAFE';
+                badge.style.color = isDark ? '#60A5FA' : '#1E40AF';
+            } else {
+                // 未登入
+                badge.textContent = '🔒 未登入';
+                badge.style.background = isDark ? '#2a2a2a' : '#e8e8e8';
+                badge.style.color = isDark ? '#aaa' : '#666';
+            }
         }
 
         // 監聽登入狀態變化（頁面載入就自動執行）
